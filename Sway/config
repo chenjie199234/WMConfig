@@ -1,0 +1,152 @@
+### Global
+    font pango:Noto Sans CJK SC 12
+    set $mod Mod4
+    floating_modifier $mod normal
+### Output
+    set $bglock ~/.config/sway/images/bglock.png
+    set $bg1 ~/.config/sway/images/bg1.png
+    set $bg2 ~/.config/sway/images/bg2.png
+    output eDP-1 res 1920x1080 pos 0,0 bg $bg1 fill
+### Input configuration
+    input "1739:32382:DELL0781:00_06CB:7E7E_To" {
+        #打字时禁用该设备
+	dwt enabled
+	#单指点击左键,双指点击右键
+        tap enabled
+	#三指点击中键
+        middle_emulation enabled
+	#disabled 双指向下滚，画面向下滚，双指向上滚，画面向上滚
+	#enabled 双指向下滚，画面向上滚，双指向上滚，画面向下滚
+        natural_scroll disabled
+    }
+### Default start program when start sway
+    exec fcitx 1> /dev/null 2>&1
+    exec ~/Tools/ShadowSocks/shadowsocks-local 1> /dev/null 2>&1
+    exec mocp -M ~/.config/moc -m ~/Music -S 1> /dev/null 2>&1
+### Interface
+    # general
+    debuglog				off
+    gaps				inner 5
+    gaps				outer 5
+    default_border			pixel 3
+    default_floating_border 		normal
+    focus_follows_mouse 		yes
+    # layout
+    bindsym $mod+tab			splitt
+    # workspace
+    bindsym $mod+comma			workspace 1
+    bindsym $mod+period			workspace 2
+    bindsym $mod+Shift+comma		move container to workspace 1
+    bindsym $mod+Shift+period		move container to workspace 2
+    bindsym $mod+slash			workspace next
+### Key bindings
+    set $term lxterminal
+    # lock
+    bindsym $mod+Return 		exec swaylock -i $bglock
+    # start a terminal
+    bindsym $mod+1 			exec $term
+    # start web browser
+    bindsym $mod+2 			exec chromium --incognito 2> /dev/null
+    # start file browser
+    bindsym $mod+3 			exec pcmanfm 2> /dev/null
+    # start music player
+    bindsym $mod+4			exec mocp -M ~/.config/moc -a ~/Music -p 2> /dev/null
+    # control music player by key
+    bindsym F4 				exec mocp -M ~/.config/moc -r 2> /dev/null
+    bindsym XF86AudioPrev 		exec mocp -M ~/.config/moc -r 2> /dev/null
+    bindsym F5 				exec mocp -M ~/.config/moc -G 2> /dev/null
+    bindsym XF86AudioPlay 		exec mocp -M ~/.config/moc -G 2> /dev/null
+    bindsym XF86AudioStop 		exec mocp -M ~/.config/moc -G 2> /dev/null
+    bindsym F6 				exec mocp -M ~/.config/moc -f 2> /dev/null
+    bindsym XF86AudioNext 		exec mocp -M ~/.config/moc -f 2> /dev/null
+    # start audio control
+    bindsym $mod+5			exec $term -e pulsemixer
+    # control audio by key
+    bindsym F1 				exec pulsemixer --toggle-mute
+    bindsym XF86AudioMute 		exec pulsemixer --toggle-mute
+    bindsym F2 				exec pulsemixer --change-volume -5
+    bindsym XF86AudioLowerVolume 	exec pulsemixer --change-volume -5
+    bindsym F3 				exec pulsemixer --change-volume +5
+    bindsym XF86AudioRaiseVolume 	exec pulsemixer --change-volume +5
+    # start wifi
+    bindsym $mod+6 			exec $term -e sudo wifi-menu
+    # start darktable
+    bindsym $mod+7			exec darktable 2> /dev/null
+    # start gimp
+    bindsym $mod+8			exec gimp
+    # toggle fullscreen
+    bindsym $mod+f 			fullscreen
+### Moving around:
+    # move focus in window
+    bindsym $mod+h 			focus left
+    bindsym $mod+j 			focus down
+    bindsym $mod+k 			focus up
+    bindsym $mod+l 			focus right
+    # move window position
+    bindsym $mod+Left 			move left
+    bindsym $mod+Right 			move right
+    bindsym $mod+Down 			move down
+    bindsym $mod+Up 			move up
+    # scratchpad
+    bindsym $mod+Shift+space		move scratchpad
+    bindsym $mod+space			scratchpad show
+### Kill focused window
+    bindsym $mod+q 			kill
+### Reload the configuration file
+    bindsym $mod+Shift+c 		reload
+    bindsym $mod+Shift+r 		restart
+### Resize
+    bindsym $mod+r		mode "resize"
+    mode "resize" {
+	# - shrink
+	# = grow
+	bindsym minus 		resize shrink width 10 px or 10 ppt;resize shrink height 10 px or 10 ppt
+	bindsym equal 		resize grow width 10 px or 10 ppt;resize grow height 10 px or 10 ppt
+	# cancel
+	bindsym Return 		mode "default"
+	bindsym Escape 		mode "default"
+    }
+    bindsym $mod+Shift+equal 	mode "restart"
+    mode "restart" {
+        # confirm
+    	bindsym y 		exec reboot
+	bindsym Return 		exec reboot
+	# cancel
+	bindsym n 		mode "default"
+	bindsym Escape 		mode "default"
+    }
+    bindsym $mod+Shift+minus 	mode "shutdown"
+    mode "poweroff" {
+        # confirm
+    	bindsym y 		exec poweroff
+	bindsym Return 		exec poweroff
+	# cancel
+	bindsym n 		mode "default"
+	bindsym Escape 		mode "default"
+    }
+    bindsym $mod+Shift+Backspace 	mode "exit-sway"
+    mode "exit-sway" {
+        # confirm
+	bindsym y 		exec pkill shadowsocks;exec pkill mocp;exit
+	bindsym Return 		exec pkill shadowsocks;exec pkill mocp;exit
+	# cancel
+	bindsym n 		mode "default"
+	bindsym Escape 		mode "default"
+    }
+### Color
+    client.focused #00000000 #80808080 #A52A2A #FF0000 #3CB371
+    client.unfocused #00000000 #4682B480 #0000CD #FF0000 #FFC0CB
+# Status Bar:
+bar {
+    separator_symbol " :|: "
+    status_command "~/.config/sway/bin/bar"
+    position top
+    colors {
+        background #80808080
+	separator #A52A2A
+        statusline #A52A2A
+	focused_workspace #98FB98 #98FB98 #0000CD
+	active_workspace #FFC0CB #FFC0CB #0000CD
+	inactive_workspace #FFC0CB #FFC0CB #0000CD
+    }
+}

@@ -1,0 +1,368 @@
+##########          ALL          ##########
+#下面设置全局通用的设置
+Style * !Title,BorderWidth 1,HandleWidth 1,FvwmBorder,FirmBorder,SloppyFocus,MouseFocusClickRaises,!Icon
+Style * TitleCascadePlacement,GrabFocusOff,!UsePPosition
+Style * WindowShadeScrolls,WindowShadeSteps 10
+Style * DecorateTransient,StackTransientParent,!FPGrabFocusTransient,FPReleaseFocusTransient
+Style * ResizeOpaque,SnapAttraction 15 SameType ScreenAll,SnapGrid
+
+#最大窗口铺满屏幕
+EwmhBaseStruts 0 0 0 0
+#禁用鼠标接触边缘时候的滚屏
+EdgeScroll 0 0
+#双击时间
+ClickTime 400
+#桌面数量
+DeskTopSize 2x2
+#隐藏移动窗口时左上角的像素位置显示窗口
+HideGeometryWindow
+#移动窗口时不使用透明网格，而是窗口的实时移动
+OpaqueMoveSize unlimited
+#忽略capslock，numlock，scrolllock按键（只是fvwm忽略，其他程序不会忽略）
+IgnoreModifiers L25
+#下面设置一些颜色，包括透明的
+Colorset 0 RootTransparent buffer,Tint black 0
+Colorset 1 RootTransparent buffer,Tint black 20
+Colorset 2 RootTransparent buffer,Tint black 40
+Colorset 3 RootTransparent buffer,Tint black 60
+Colorset 4 fg black,bg white,sh white,hi white
+
+##########          StartFunction          ##########
+DestroyFunc StartFunction
+AddToFunc StartFunction
++ I Exec pkill conky
++ I Exec pkill fcitx
++ I Module FvwmButtons RightButtons
++ I Module FvwmIconMan
+
+##########          InitFunction         ###########
+DestroyFunc InitFunction
+AddToFunc InitFunction
++ I Exec fvwm-root -r /usr/share/fvwm/icons/background.png
++ I Exec conky -q
++ I Exec fcitx
+
+#########           SessionInitFunction       ###########
+DestroyFunc SessionInitFunction
+AddToFunc SessionInitFunction
++ I Exec fvwm-root -r /usr/share/fvwm/icons/background.png
++ I Exec conky -q
++ I Exec fcitx
+
+#########           RestartFunction        ##########
+DestroyFunc RestartFunction
+AddToFunc RestartFunction
++ I Exec conky -q
++ I Exec fcitx
+
+#########           SessionRestartFunction        ##########
+DestroyFunc SessionRestartFunction
+AddToFunc SessionRestartFunction
++ I Exec conky -q
++ I Exec fcitx
+
+##########          Menu          #############
+#下面设置菜单的通用格式，样式，字体等
+Colorset 5 fg black, bg white,hi,sh,Plain,NoShape
+Colorset 6 fg white, bg grey20,hi,sh,Plain,NoShape
+Colorset 7 fg white, bg #0066CC,hi,sh,Plain,NoShape
+MenuStyle * MenuColorset 5,ActiveColorset 6,TitleColorset 7,HilightBack,HilightTitleBack,Hilight3DOff
+MenuStyle * SeparatorsLong,TitleUnderLines0,Borderwidth 1,TrianglesSolid,TrianglesUseFore
+MenuStyle * Animation,PopupImmediately,PopdownImmediately,PopupOffset 0 100,!TitleWarp
+MenuStyle * ItemFormat "%|%3.1i%5.3l%5.3>%|"
+MenuStyle * Font "xft:Noto Sans Mono CJK SC:style=Bold:Size=10"
+
+#下面设置鼠标在主界面右键弹出的主菜单
+DestroyMenu MenuRoot
+AddToMenu MenuRoot $[USER] Title
++ "Tools%/usr/share/fvwm/icons/tools.png%" Popup MenuTools
++ "Apps%/usr/share/fvwm/icons/apps.png%" Popup MenuApps
++ "Terminal%/usr/share/fvwm/icons/terminal.png%" Exec lxterminal
++ "" Nop
++ "Identify%/usr/share/fvwm/icons/ident.png%" Module FvwmIdent
++ "Refresh%/usr/share/fvwm/icons/refresh.png%" Refresh
++ "Restart%/usr/share/fvwm/icons/restart.png%" Restart
++ "" Nop
++ "Quit%/usr/share/fvwm/icons/quit-menu.png%" Popup MenuQuit
+
+#下面一行设置Tools子菜单
+DestroyMenu MenuTools
+AddToMenu MenuTools "Tools" Title
++ "FvwmConfig" Exec lxterminal -e nvim /usr/share/fvwm/config
++ "VimConfig" Exec lxterminal -e nvim /usr/share/nvim/sysinit.vim
+
+#下面一行设置Apps子菜单
+DestroyMenu MenuApps
+AddToMenu MenuApps "Apps" Title
+Test (x putty) + "Putty" Exec putty
+Test (x codeblocks) + "CodeBlocks" Exec codeblocks
+Test (x blender) + "Blender" Exec blender
+Test (x darktable) + "Darktable" Exec darktable
+Test (x rawtherapee) + "Rawtherapee" Exec rawtherapee
+Test (x gimp) + "Gimp" Exec gimp
+
+#下面一行是设置Quit子菜单
+DestroyMenu MenuQuit
+AddToMenu MenuQuit "Quit" Title
++ "Shutdown" Module FvwmForm Form-ShutdownConfirm
++ "Reboot" Module FvwmForm Form-RebootConfirm
++ "QuitFvwm" Module FvwmForm Form-QuitConfirm
+
+##########          FvwmForm              ##########
+Style FvwmForm !Title,HandleWidth 5,WindowListSkip,CirculateSkip,!Maximizable,StayOnTop,Sticky
+*FvwmFormDefault: Font "xft:Noto Sans Mono CJK SC:style=Bold:size=10"
+*FvwmFormDefault: ButtonFont "xft:Noto Sans Mono CJK SC:style=Bold:size=10"
+*FvwmFormDefault: TimeoutFont "xft:Noto Sans Mono CJK SC:style=Bold:size=10"
+*FvwmFormDefault: Fore black
+*FvwmFormDefault: Back white
+*FvwmFormDefault: ButtonPointerFore blue
+*FvwmFormDefault: ButtonPointerBack grey
+*FvwmFormDefault: ButtonInPointerFore grey
+*FvwmFormDefault: ButtonInPointerBack blue
+##关机确认
+DestroyModuleConfig  Form-ShutdownConfirm: *
+*Form-ShutdownConfirm: GrabServer
+*Form-ShutdownConfirm: WarpPointer
+*Form-ShutdownConfirm: Line        center
+*Form-ShutdownConfirm: Text        "Realy want to shutdown?"
+*Form-ShutdownConfirm: Line        center
+*Form-ShutdownConfirm: Timeout     10 "Exec poweroff" "Shutdown in %% seconds."
+*Form-ShutdownConfirm: Line        expand
+*Form-ShutdownConfirm: Button      quit "Yes" ^M
+*Form-ShutdownConfirm: Command     Exec poweroff
+*Form-ShutdownConfirm: Button      quit "No" ^[
+*Form-ShutdownConfirm: Command     Nop
+##重启确认
+DestroyModuleConfig  Form-RebootConfirm: *
+*Form-RebootConfirm: GrabServer
+*Form-RebootConfirm: WarpPointer
+*Form-RebootConfirm: Line        center
+*Form-RebootConfirm: Text        "Realy want to reboot?"
+*Form-RebootConfirm: Line        center
+*Form-RebootConfirm: Timeout     10 "Exec reboot" "Reboot in %% seconds."
+*Form-RebootConfirm: Line        expand
+*Form-RebootConfirm: Button      quit "Yes" ^M
+*Form-RebootConfirm: Command     Exec reboot
+*Form-RebootConfirm: Button      quit "No" ^[
+*Form-RebootConfirm: Command     Nop
+##退出Fvwm确认
+DestroyModuleConfig  Form-QuitConfirm: *
+*Form-QuitConfirm: GrabServer
+*Form-QuitConfirm: WarpPointer
+*Form-QuitConfirm: Line        center
+*Form-QuitConfirm: Text        "Realy want to quit fvwm?"
+*Form-QuitConfirm: Line        center
+*Form-QuitConfirm: Timeout     10 "Exec reboot" "Quit fvwm in %% seconds."
+*Form-QuitConfirm: Line        expand
+*Form-QuitConfirm: Button      quit "Yes" ^M
+*Form-QuitConfirm: Command     Quit
+*Form-QuitConfirm: Button      quit "No" ^[
+*Form-QuitConfirm: Command     Nop
+##截图提示
+DestroyModuleConfig  Form-ScreenShot: *
+*Form-ScreenShot: GrabServer
+*Form-ScreenShot: WarpPointer
+*Form-ScreenShot: Line        center
+*Form-ScreenShot: Text        "Press left mouse and move to select an ared!"
+*Form-ScreenShot: Line        center
+*Form-ScreenShot: Text        "Or left click to select a window!"
+*Form-ScreenShot: Line        center
+*Form-ScreenShot: Text        "Screenshot file will put in ~ direcroty!"
+*Form-ScreenShot: Line        expand
+*Form-ScreenShot: Button      quit "Start"
+*Form-ScreenShot: Command     Exec scrot -s -e 'mv $f ~'
+*Form-ScreenShot: Button      quit "Cancel"
+*Form-ScreenShot: Command     Nop
+
+#下面一行设置打开终端的快捷键为ctrl+alt+1,打开terminal
+Key 1 A CM Exec lxterminal
+#ctrl+alt+2,打开chromium浏览器
+Key 2 A CM Exec chromium --incognito
+#ctrl+alt+3打开pcmanfm文件浏览器
+Key 3 A CM Exec pcmanfm
+#ctrl+alt+4打开音乐播放器
+Key 4 A CM Exec mocp -S;mocp -o r;mocp -o s;mocp -a ~/Music/;mocp -p
+#ctrl+alt+9最大化和还原当前窗口
+Key 9 A CM Maximize
+#ctrl+alt+0最小化当前焦点窗口
+Key 0 A CM Iconify
+Key minus A CM Module FvwmForm Form-ShutdownConfirm
+Key equal A CM Module FvwmForm Form-RebootConfirm
+#moc音乐播放器控制
+#下一首
+Key XF86AudioNext A N Exec mocp -f
+Key F6 A N Exec mocp -f
+Key Right A CM Exec mocp -f
+#上一首
+Key XF86AudioPrev A N Exec mocp -r
+Key F4 A N mocp -r
+Key Left A CM Exec mocp -r
+#暂停和播放之间切换
+Key XF86AudioPlay A N Exec mocp -G
+Key XF86AudioStop A N Exec mocp -G
+Key F5 A N Exec mocp -G
+#音量控制
+#静音和非静音之间切换
+Key XF86AudioMute A N Exec pulsemixer --toggle-mute
+Key F1 A N Exec pulsemixer --toggle-mute
+#增加音量
+Key XF86AudioRaiseVolume A N pulsemixer --change-volume +5
+Key F3 A N Exec pulsemixer --change-volume +5
+Key Up A CM Exec pulsemixer --change-volume +5
+#减少音量
+Key XF86AudioLowerVolume A N pulsemixer --change-volume -5
+Key F2 A N Exec pulsemixer --change-volume -5
+Key Down A CM Exec pulsemixer --change-volume -5
+#Print全屏截图
+Key Print A N Exec scrot
+#下面设置桌面切换ctrl-alt-u/i/o/p分别切换4个桌面
+Key u A CM GotoPage 0 0
+Key i A CM GotoPage 1 0
+Key o A CM GotoPage 0 1
+Key p A CM GotoPage 1 1
+#下面这个函数设置鼠标的通用格式，通过传入参数给变量 $0 对应移动 $1对应单击 $2对应双击
+DestroyFunc MoveClickX
+AddToFunc MoveClickX
++ M $0
++ C $1
++ D $2
+#下面一行禁止鼠标左键的功能
+Mouse 1 R N Nop
+#下面一行设置鼠标右键弹出菜单
+Mouse 3 R N Menu MenuRoot
+#下面一行设置鼠标左键关闭按钮的动作，$0为Nop什么都不做 $1为Close 正常关闭窗口 $2为Destroy 强制销毁
+Mouse 1 2 A MoveClickX Nop Close Destroy
+#下面一行设置鼠标左键最大化和还原按钮的动作
+Mouse 1 4 A Maximize
+#下面一行设置鼠标左键最小化按钮的动作
+Mouse 1 6 A Iconify
+#下面一行设置鼠标左键在标题栏的动作，$0为Move鼠标左键在标题栏按下可拖动窗口 $1为Raise单击窗口提升到最上一层 $2为Maximize双击最大化和还原窗口
+Mouse 1 T	A MoveClickX Move Raise Maximize
+#下面一行设置鼠标放在标题栏和边界时并且滚轮向上滚使窗口变成只有一个标题栏
+Mouse 4 TFS	A MoveClickX Nop Raise "WindowShade True"
+#下面一行设置鼠标放在标题栏和边界时并且滚轮向下滚使窗口恢复正常0
+Mouse 5 TFS	A MoveClickX Nop Raise "WindowShade False"
+#下面一行设置鼠标左键边框或者四个角落的时候 $0为Resize移动的时候可以调整窗口大小，$1为Raise单击的时候可以提升窗口 $2同上
+Mouse 1 FS	A MoveClickX Resize Raise Maximize
+
+##########          ToggleFunction           #########
+#DestroyFunc ToggleMpd
+#AddToFunc ToggleMpd
+#+ I ToggleFunction config-mpd.script "Module FvwmScript config-mpd.script"
+
+#DestroyFunc ToggleFunction
+#AddToFunc ToggleFunction
+#+ I None ($$0,CirculateHit) $$1
+#+ I TestRc (Match) Break
+#+ I Next (currentpage,Visible,!iconic,$$0,CirculateHit) Close
+#+ I TestRc (Match) Break
+#+ I Next ($$0,CirculateHit) Function MakeVisible
+
+#DestroyFunc MakeVisible
+#AddToFunc MakeVisible
+#+ I MoveToDesk
+#+ I MoveToPage
+#+ I MoveToScreen
+#+ I Iconify off
+#+ I WindowShade off
+
+##########          CursorStyle          ##########
+#下面设置鼠标在不同地方的样式
+CursorStyle DEFAULT left_ptr
+CursorStyle TITLE left_ptr
+CursorStyle MENU left_ptr
+CursorStyle POSITION left_ptr
+#CursorStyle SYS pointer
+
+##########          FvwmButtons          ##########
+#下面设置FvwmButtons的通用样式
+Style FvwmButtons !Title,WindowListSkip,CirculateSkip,BorderWidth 0,HandleWidth 0,Sticky,StaysOnButton,NeverFocus
+         #####      MyButtons     ######
+#下面设置右边的按钮
+#从右到左分别为 1.FvwmPager虚拟桌面页 2.上截图 下wifi 3.上galculator计算器 下pulsemixer音量控制器 4.上播放音乐 下下一曲 5.上暂停音乐 下上一曲 6.moc音乐播放器 7.浏览器 8.终端 9.文件管理器 10.conky系统监控
+DestroyModuleConfig RightButtons: *
+*RightButtons: Columns 420
+*RightButtons: Rows 60
+*RightButtons: Frame 0
+*RightButtons: BoxSize fixed
+*RightButtons: Colorset 0
+*RightButtons: ActiveColorset 1
+*RightButtons: PressColorset 2
+*RightButtons: Padding 0 0
+*RightButtons: Geometry -0-0
+#*RightButtons: (640x60,Swallow conky 'Exec conky -q',Colorset 0,ActiveColorset 0,PressColorset 0)
+*RightButtons: (60x60+0+0,Icon "/usr/share/fvwm/icons/filemanager-min.png",ActiveIcon "/usr/share/fvwm/icons/filemanager-max.png",Action (Mouse 1) "Exec pcmanfm",Action (Mouse 3) "Exec pkill pcmanfm")
+*RightButtons: (60x60+60+0,Icon "/usr/share/fvwm/icons/term-min.png",ActiveIcon "/usr/share/fvwm/icons/term-max.png",Action (Mouse 1) "Exec lxterminal",Action (Mouse 3) "Exec pkill lxterminal") 
+*RightButtons: (60x60+120+0,Icon "/usr/share/fvwm/icons/browser-min.png",ActiveIcon "/usr/share/fvwm/icons/browser-max.png",Action (Mouse 1) "Exec chromium --incognito",Action (Mouse 3) "Exec pkill chromium")
+*RightButtons: (60x60+180+0,Icon "/usr/share/fvwm/icons/music-min.png",ActiveIcon "/usr/share/fvwm/icons/music-max.png",Action (Mouse 1) "Exec mocp -S;mocp -o r;mocp -o s;mocp -a ~/Music/;mocp -p",Action (Mouse 3) "Exec mocp -x")
+*RightButtons: (30x30+240+0,Icon "/usr/share/fvwm/icons/pause-min.png",ActiveIcon "/usr/share/fvwm/icons/pause-max.png",Action (Mouse 1) "Exec mocp -P")
+*RightButtons: (30x30+270+0,Icon "/usr/share/fvwm/icons/play-min.png",ActiveIcon "/usr/share/fvwm/icons/play-max.png",Action (Mouse 1) "Exec mocp -U")
+*RightButtons: (30x30+240+30,Icon "/usr/share/fvwm/icons/left-min.png",ActiveIcon "/usr/share/fvwm/icons/left-max.png",Action (Mouse 1) "Exec mocp -r")
+*RightButtons: (30x30+270+30,Icon "/usr/share/fvwm/icons/right-min.png",ActiveIcon "/usr/share/fvwm/icons/right-max.png",Action (Mouse 1) "Exec mocp -f")
+*RightButtons: (30x30+300+0,Icon "/usr/share/fvwm/icons/calculator-min.png",ActiveIcon "/usr/share/fvwm/icons/calculator-max.png",Action (Mouse 1) "Exec galculator",Action (Mouse 3) "Exec pkill galculator")
+*RightButtons: (30x30+330+0,Icon "/usr/share/fvwm/icons/printscreen-min.png",ActiveIcon "/usr/share/fvwm/icons/printscreen-max.png",Action (Mouse 1) "Module FvwmForm Form-ScreenShot")
+*RightButtons: (30x30+300+30,Icon "/usr/share/fvwm/icons/sound-min.png",ActiveIcon "/usr/share/fvwm/icons/sound-max.png",Action (Mouse 1) "Exec lxterminal -e pulsemixer",Action (Mouse 3) "Exec pkill pulsemixer")
+#*RightButtons: (30x30+760+30,Icon "/usr/share/fvwm/icons/sound-min.png",ActiveIcon "/usr/share/fvwm/icons/sound-max.png",Action (Mouse 1) "Exec lxterminal -e alsamixer",Action (Mouse 3) "Exec pkill alsamixer")
+*RightButtons: (30x30+330+30,Icon "/usr/share/fvwm/icons/wifi-min.png",ActiveIcon "/usr/share/fvwm/icons/wifi-max.png",Action (Mouse 1) "Exec lxterminal -e sudo wifi-menu")
+*RightButtons: (60x60+360+0,Swallow FvwmPager 'Module FvwmPager',Colorset 0,ActiveColorset 0,PressColorset 0)
+
+##########          FvwmPager          ##########
+#下面设置左面选择器右下角虚线隔开的4个桌面
+Style FvwmPager !Title,WindowListSkip,CirculateSkip,BorderWidth 0,HandleWidth 0,Sticky,StaysOnButton
+*FvwmPager: UseSkipList
+*FvwmPager: Geometry 60x60-120-0
+*FvwmPager: NoStartIconic
+*FvwmPager: NoShapeLabels
+*FvwmPager: Font None
+*FvwmPager: Colorset * 0
+*FvwmPager: HilightColorset * 1
+*FvwmPager: WindowBorderWidth 0
+
+##########          FvwmIconMan         #############
+#虾米按设置最小化的时候窗口存在的地方,类似Windows的任务栏
+Style FvwmIconMan !Title,WindowListSkip,CirculateSkip,BorderWidth 0,HandleWidth 0,Sticky,StaysOnButton
+
+DestroyFunc IconManClick
+AddToFunc IconManClick
++ I ThisWindow (Raised,!Shaded,!Iconic,CurrentPage) Iconify
++ I TestRc (Match) Break
++ I ThisWindow (!Raised) Raise
++ I ThisWindow (Shaded) WindowShade
++ I ThisWindow (Iconic) Iconify
++ I ThisWindow (AcceptsFocus) FlipFocus
+
+*FvwmIconMan: Colorset 0
+*FvwmIconMan: PlainColorset 1
+*FvwmIconMan: FocusColorset 0
+*FvwmIconMan: FocusAndSelectColorset 3
+*FvwmIconMan: SelectColorset 3
+*FvwmIconMan: IconColorset 2
+*FvwmIconMan: IconAndSelectColorset 3
+*FvwmIconMan: DrawIcons false
+*FvwmIconMan: Format "%t"
+*FvwmIconMan: Font "xft:Noto Sans Mono CJK SC:style=Bold:size=10"
+*FvwmIconMan: ReliefThickness 0
+*FvwmIconMan: UseWinList true
+*FvwmIconMan: ButtonGeometry 210x20
+*FvwmIconMan: ManagerGeometry 2x3+1500+960
+*FvwmIconMan: MaxButtonWidth 210
+*FvwmIconMan: Resolution page
+*FvwmIconMan: Sort id
+*FvwmIconMan: Action Mouse 1 N sendcommand IconManClick
+*FvwmIconMan: Action Mouse 2 A sendcommand Nop
+*FvwmIconMan: Action Mouse 3 N sendcommand "MoveClickX Nop Close Destroy"
+
+##########          FvwmIdent           ##########
+#下面设置窗口属性查看器Identify的通用属性
+Style FvwmIdent WindowListSkip,CirculateSkip,!Borders,!Handles
+*FvwmIdent: Colorset 4
+*FvwmIdent: Font "xft:Noto Sans Mono CJK SC:style=Bold:size=10"
+
+##########          ExitFunction          ##########
+#下面设置退出Fvwm，及离开桌面环境，返回纯命令行界面时候执行的
+DestroyFunc ExitFunction
+AddToFunc ExitFunction
+#下面一行结束fcitx的运行，输入法在命令行界面没用
++ I Exec pkill conky
++ I Exec pkill fcitx
++ I Exec sync
