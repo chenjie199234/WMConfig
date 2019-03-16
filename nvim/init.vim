@@ -2,44 +2,48 @@
 set filetype=off
 call plug#begin('~/.config/nvim/plugs')
 "Plug 'autozimu/LanguageClient-neovim',{'branch': 'next','do': 'bash install.sh'}
-Plug 'Shougo/deoplete.nvim',{ 'do': ':UpdateRemotePlugins' }
+"Plug 'Shougo/deoplete.nvim',{ 'do': ':UpdateRemotePlugins' }
+"Plug 'zchee/deoplete-go',{'do':'make','for':'go'}
+"Plug 'fatih/vim-go',{'do':':GoUpdateBinaries godef','for':'go'}
+Plug 'w0rp/ale'
 Plug 'Shougo/neosnippet.vim'
 Plug 'Shougo/neosnippet-snippets'
-Plug 'zchee/deoplete-go',{'do':'make','for':'go'}
-Plug 'fatih/vim-go',{'do':':GoUpdateBinaries godef','for':'go'}
 Plug 'scrooloose/nerdtree'
 Plug 'jiangmiao/auto-pairs'
 Plug 'morhetz/gruvbox'
 Plug 'bling/vim-bufferline'
 call plug#end()
 "deoplete
-	let g:deoplete#enable_at_startup = 1
-	call deoplete#custom#option({
-		\ 'min_pattern_length': 2,
-		\ 'ignore_case': v:true,
-		\ })
-"neosnippet
-	imap <expr><TAB>     neosnippet#expandable_or_jumpable() ? "\<Plug>(neosnippet_expand_or_jump)":"\<TAB>"
-	smap <expr><TAB>     neosnippet#expandable_or_jumpable() ? "\<Plug>(neosnippet_expand_or_jump)":"\<TAB>"
+	"let g:deoplete#enable_at_startup = 1
+	"call deoplete#custom#option({
+		"\ 'min_pattern_length': 2,
+		"\ 'ignore_case': v:true,
+		"\ })
 "deoplete-go
-	let g:deoplete#sources#go#pointer = 1
-	let g:deoplete#sources#go#gocode_binary = $GOPATH.'/bin/gocode'
-	let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const']
-	autocmd Bufwrite * silent! pclose!
+	"let g:deoplete#sources#go#pointer = 1
+	"let g:deoplete#sources#go#gocode_binary = $GOPATH.'/bin/gocode'
+	"let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const']
+	"autocmd Bufwrite * silent! pclose!
 "vim-go
-	autocmd BufEnter *.go nnoremap <C-i> :GoDef<CR>
-	autocmd BufEnter *.go nnoremap <M-i> :GoDef<CR>
-	autocmd BufEnter *.go nnoremap <C-LeftMouse> <LeftMouse>:GoDef<CR>
-	autocmd BufEnter *.go vnoremap <C-LeftMouse> <Esc><LeftMouse>:GoDef<CR>
-	autocmd BufEnter *.go nnoremap <M-LeftMouse> <LeftMouse>:GoDef<CR>
-	autocmd BufEnter *.go vnoremap <M-LeftMouse> <Esc><LeftMouse>:GoDef<CR>
-	nmap <M-o> <C-o>
-	let g:go_def_mapping_enabled=0
-	let g:go_def_mode='godef'
+	"autocmd BufEnter *.go nnoremap <C-i> :GoDef<CR>
+	"autocmd BufEnter *.go nnoremap <M-i> :GoDef<CR>
+	"autocmd BufEnter *.go nnoremap <C-LeftMouse> <LeftMouse>:GoDef<CR>
+	"autocmd BufEnter *.go vnoremap <C-LeftMouse> <Esc><LeftMouse>:GoDef<CR>
+	"autocmd BufEnter *.go nnoremap <M-LeftMouse> <LeftMouse>:GoDef<CR>
+	"autocmd BufEnter *.go vnoremap <M-LeftMouse> <Esc><LeftMouse>:GoDef<CR>
+	"nmap <M-o> <C-o>
+	"let g:go_def_mapping_enabled=0
+	"let g:go_def_mode='godef'
 	"解决折叠问题
-	let g:go_fmt_experimental=1
+	"let g:go_fmt_experimental=1
 "languageclient-neovim
-	"let g:LanguageClient_hasSnippetSupport=0
+	"log设置
+	"let g:LanguageClient_loggingFile=expand('~/.config/nvim/LanguageClient.log')
+	"let g:LanguageClient_loggingLevel='WARN'
+	"输入间隔超过多少秒会进行languageserver检测
+	"let g:LanguageClient_changeThrottle=0.2
+	"languageserver超时时间
+	"let g:LanguageClient_waitOutputTimeout=5
 	"let g:LanguageClient_rootMarkers={
 		"\ 'go':['.git','go.mod'],
 		"\ }
@@ -47,8 +51,6 @@ call plug#end()
 		"\ 'go':['bingo'],
 		"\ }
 	"autocmd BufWrite *.go call LanguageClient_textDocument_formatting()
-	"let g:LanguageClient_loggingFile=expand('~/.config/nvim/LanguageClient.log')
-	"let g:LanguageClient_loggingLevel='WARN'
 	"nnoremap <C-i> :call LanguageClient_textDocument_definition()<CR>
 	"nnoremap <M-i> :call LanguageClient_textDocument_definition()<CR>
 	"nnoremap <C-LeftMouse> <LeftMouse>:call LanguageClient_textDocument_definition()<CR>
@@ -56,6 +58,39 @@ call plug#end()
 	"nnoremap <M-LeftMouse> <LeftMouse>:call LanguageClient_textDocument_definition()<CR>
 	"vnoremap <M-LeftMouse> <Esc><LeftMouse>:call LanguageClient_textDocument_definition()<CR>
 	"nnoremap <M-o> <C-o>
+"ale
+	"let g:ale_enabled=1
+	"lint
+	let g:ale_lint_on_text_changed=0
+	let g:ale_lint_on_insert_leave=0
+	let g:ale_lint_on_enter=1
+	let g:ale_lint_on_save=1
+	let g:ale_lint_on_filetype_changed=1
+	let g:ale_linters={
+		\ 'go':['bingo','gofmt','golint','go vet'],
+		\ }
+	let g:ale_linters_explict=1
+	"fix
+	let g:ale_fix_on_save=1
+	let g:ale_fixers={
+		\ '*':['remove_trailing_lines','trim_whitespace'],
+		\ 'go':['gofmt'],
+		\ }
+	"lsp
+	let g:ale_completion_enabled=1
+	let g:ale_completion_delay=100
+	nnoremap <C-i> :ALEGoToDefinition<CR>
+	nnoremap <M-i> :ALEGoToDefinition<CR>
+	nnoremap <C-LeftMouse> :ALEGoToDefinition<CR>
+	vnoremap <C-LeftMouse> :ALEGoToDefinition<CR>
+	nnoremap <M-LeftMouse> :ALEGoToDefinition<CR>
+	vnoremap <M-LeftMouse> :ALEGoToDefinition<CR>
+	nnoremap <M-o> <C-o>
+"neosnippet
+	let g:netsnippet#enable_snipmate_compatibility=1
+	let g:neosnippet#snippets_directory='~/.config/nvim/plugs/vim-snippets/snippets'
+	imap <expr><TAB>     neosnippet#expandable_or_jumpable() ? "\<Plug>(neosnippet_expand_or_jump)":"\<TAB>"
+	smap <expr><TAB>     neosnippet#expandable_or_jumpable() ? "\<Plug>(neosnippet_expand_or_jump)":"\<TAB>"
 "auto-pairs
 	let g:AutoPairsMapCh=0
 	let g:AutoPairsShortcutToggle=''

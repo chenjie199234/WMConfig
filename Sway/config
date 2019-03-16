@@ -6,9 +6,13 @@
     set $bglock ~/.config/sway/images/bglock.png
     set $bg1 ~/.config/sway/images/bg1.png
     set $bg2 ~/.config/sway/images/bg2.png
-    output eDP-1 res 1920x1080 pos 0,0 bg $bg1 fill
+    output eDP-1 {
+    	background $bg1 fill
+	resolution 1920x1080
+	position 0,0
+    }
 ### Input configuration
-    input "1739:32382:DELL0781:00_06CB:7E7E_To" {
+    input "1739:32382:DELL0781:00_06CB:7E7E_Touchpad" {
         #打字时禁用该设备
 	dwt enabled
 	#单指点击左键,双指点击右键
@@ -23,9 +27,9 @@
     exec fcitx 1> /dev/null 2>&1
     exec ~/Tools/ShadowSocks/shadowsocks-local 1> /dev/null 2>&1
     exec mocp -M ~/.config/moc -m ~/Music -S 1> /dev/null 2>&1
+    #exec swayidle -w timeout 120 'swaylock -i $bglock'
 ### Interface
     # general
-    debuglog				off
     gaps				inner 5
     gaps				outer 5
     default_border			pixel 3
@@ -33,6 +37,7 @@
     focus_follows_mouse 		yes
     # layout
     bindsym $mod+tab			splitt
+    bindsym $mod+Shift+tab		layout toggle all
     # workspace
     bindsym $mod+comma			workspace 1
     bindsym $mod+period			workspace 2
@@ -51,6 +56,10 @@
     bindsym $mod+3 			exec pcmanfm 2> /dev/null
     # start music player
     bindsym $mod+4			exec mocp -M ~/.config/moc -a ~/Music -p 2> /dev/null
+    # start darktable
+    bindsym $mod+5			exec darktable 2> /dev/null
+    # start gimp
+    bindsym $mod+6			exec gimp
     # control music player by key
     bindsym F4 				exec mocp -M ~/.config/moc -r 2> /dev/null
     bindsym XF86AudioPrev 		exec mocp -M ~/.config/moc -r 2> /dev/null
@@ -59,21 +68,17 @@
     bindsym XF86AudioStop 		exec mocp -M ~/.config/moc -G 2> /dev/null
     bindsym F6 				exec mocp -M ~/.config/moc -f 2> /dev/null
     bindsym XF86AudioNext 		exec mocp -M ~/.config/moc -f 2> /dev/null
-    # start audio control
-    bindsym $mod+5			exec $term -e pulsemixer
+    # start music player interface
+    bindsym $mod+bracketleft		exec $term -e mocp -M ~/.config/moc -m ~/Music
     # control audio by key
-    bindsym F1 				exec pulsemixer --toggle-mute
-    bindsym XF86AudioMute 		exec pulsemixer --toggle-mute
-    bindsym F2 				exec pulsemixer --change-volume -5
-    bindsym XF86AudioLowerVolume 	exec pulsemixer --change-volume -5
-    bindsym F3 				exec pulsemixer --change-volume +5
-    bindsym XF86AudioRaiseVolume 	exec pulsemixer --change-volume +5
+    bindsym F1 				exec pamixer -t
+    bindsym XF86AudioMute 		exec pamixer -t
+    bindsym F2 				exec pamixer -d 5
+    bindsym XF86AudioLowerVolume 	exec pamixer -d 5
+    bindsym F3 				exec pamixer -i 5
+    bindsym XF86AudioRaiseVolume 	exec pamixer -i 5
     # start wifi
-    bindsym $mod+6 			exec $term -e sudo wifi-menu
-    # start darktable
-    bindsym $mod+7			exec darktable 2> /dev/null
-    # start gimp
-    bindsym $mod+8			exec gimp
+    bindsym $mod+bracketright 		exec $term -e sudo wifi-menu
     # toggle fullscreen
     bindsym $mod+f 			fullscreen
 ### Moving around:
@@ -115,7 +120,7 @@
 	bindsym n 		mode "default"
 	bindsym Escape 		mode "default"
     }
-    bindsym $mod+Shift+minus 	mode "shutdown"
+    bindsym $mod+Shift+minus 	mode "poweroff"
     mode "poweroff" {
         # confirm
     	bindsym y 		exec poweroff
@@ -127,8 +132,8 @@
     bindsym $mod+Shift+Backspace 	mode "exit-sway"
     mode "exit-sway" {
         # confirm
-	bindsym y 		exec pkill shadowsocks;exec pkill mocp;exit
-	bindsym Return 		exec pkill shadowsocks;exec pkill mocp;exit
+	bindsym y 		exec pkill shadowsocks;exec pkill mocp;exec pkill jackd;exit
+	bindsym Return 		exec pkill shadowsocks;exec pkill mocp;exec pkill jackd;exit
 	# cancel
 	bindsym n 		mode "default"
 	bindsym Escape 		mode "default"
