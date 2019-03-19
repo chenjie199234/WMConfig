@@ -46,7 +46,7 @@ func main() {
 				for _, card := range tempcards {
 					useful := false
 					for _, flag := range card.Flags {
-						if flag == "up" {
+						if flag == "up" && len(card.Addrs) != 0 {
 							useful = true
 						} else if flag == "loopback" {
 							useful = false
