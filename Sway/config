@@ -3,13 +3,18 @@
     set $mod Mod4
     floating_modifier $mod normal
 ### Output
-    set $bglock ~/.config/sway/images/bglock.png
-    set $bg1 ~/.config/sway/images/bg1.png
-    set $bg2 ~/.config/sway/images/bg2.png
+    set $bglock ~/.config/sway/images/bglock.jpg
+    set $bg1 ~/.config/sway/images/bg2.png
+    set $bg2 ~/.config/sway/images/bg1.png
     output eDP-1 {
-    	background $bg1 fill
-	resolution 1920x1080
-	position 0,0
+        background $bg1 fill
+        resolution 1920x1080
+        position 0,0
+    }
+    output HDMI-A-1 {
+        background $bg2 fill
+        resolution 1920x1200
+        position 1920,0
     }
 ### Input configuration
     input "1739:32382:DELL0781:00_06CB:7E7E_Touchpad" {
@@ -27,7 +32,7 @@
     exec fcitx 1> /dev/null 2>&1
     exec ~/Tools/ShadowSocks/shadowsocks-local 1> /dev/null 2>&1
     exec mocp -M ~/.config/moc -m ~/Music -S 1> /dev/null 2>&1
-    #exec swayidle -w timeout 120 'swaylock -i $bglock'
+    exec swayidle -w timeout 300 'swaylock -f -i $bglock -s fill' timeout 600 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"'
 ### Interface
     # general
     gaps				inner 5
@@ -44,11 +49,17 @@
     bindsym $mod+Shift+comma		move container to workspace 1
     bindsym $mod+Shift+period		move container to workspace 2
     bindsym $mod+slash			workspace next
-### Key bindings
+### Key binding
     set $term lxterminal
     # lock
-    bindsym $mod+Return 		exec swaylock -i $bglock
-    # start a terminal
+    bindsym $mod+Return 		exec swaylock -i $bglock -s fill
+    # screenshot
+    bindsym $mod+s			exec grim -g "$(slurp)" $HOME/$(date +'%Y-%m-%d-%H:%M:%S.png')
+    # start music player interface
+    bindsym $mod+bracketleft		exec $term -e mocp -M ~/.config/moc -m ~/Music
+    # start wifi
+    bindsym $mod+bracketright 		exec $term -e nmtui
+    # start a termina
     bindsym $mod+1 			exec $term
     # start web browser
     bindsym $mod+2 			exec chromium --incognito 2> /dev/null
@@ -68,8 +79,6 @@
     bindsym XF86AudioStop 		exec mocp -M ~/.config/moc -G 2> /dev/null
     bindsym F6 				exec mocp -M ~/.config/moc -f 2> /dev/null
     bindsym XF86AudioNext 		exec mocp -M ~/.config/moc -f 2> /dev/null
-    # start music player interface
-    bindsym $mod+bracketleft		exec $term -e mocp -M ~/.config/moc -m ~/Music
     # control audio by key
     bindsym F1 				exec pamixer -t
     bindsym XF86AudioMute 		exec pamixer -t
@@ -77,8 +86,6 @@
     bindsym XF86AudioLowerVolume 	exec pamixer -d 5
     bindsym F3 				exec pamixer -i 5
     bindsym XF86AudioRaiseVolume 	exec pamixer -i 5
-    # start wifi
-    bindsym $mod+bracketright 		exec $term -e sudo wifi-menu
     # toggle fullscreen
     bindsym $mod+f 			fullscreen
 ### Moving around:
@@ -111,6 +118,7 @@
 	bindsym Return 		mode "default"
 	bindsym Escape 		mode "default"
     }
+### Restart
     bindsym $mod+Shift+equal 	mode "restart"
     mode "restart" {
         # confirm
@@ -120,6 +128,7 @@
 	bindsym n 		mode "default"
 	bindsym Escape 		mode "default"
     }
+### Poweroff
     bindsym $mod+Shift+minus 	mode "poweroff"
     mode "poweroff" {
         # confirm
@@ -129,6 +138,7 @@
 	bindsym n 		mode "default"
 	bindsym Escape 		mode "default"
     }
+## Exit
     bindsym $mod+Shift+Backspace 	mode "exit-sway"
     mode "exit-sway" {
         # confirm

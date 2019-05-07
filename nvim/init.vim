@@ -1,10 +1,6 @@
 "设置插件
 set filetype=off
 call plug#begin('~/.config/nvim/plugs')
-"Plug 'autozimu/LanguageClient-neovim',{'branch': 'next','do': 'bash install.sh'}
-"Plug 'Shougo/deoplete.nvim',{ 'do': ':UpdateRemotePlugins' }
-"Plug 'zchee/deoplete-go',{'do':'make','for':'go'}
-"Plug 'fatih/vim-go',{'do':':GoUpdateBinaries godef','for':'go'}
 Plug 'w0rp/ale'
 Plug 'Shougo/neosnippet.vim'
 Plug 'Shougo/neosnippet-snippets'
@@ -13,53 +9,8 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'morhetz/gruvbox'
 Plug 'bling/vim-bufferline'
 call plug#end()
-"deoplete
-	"let g:deoplete#enable_at_startup = 1
-	"call deoplete#custom#option({
-		"\ 'min_pattern_length': 2,
-		"\ 'ignore_case': v:true,
-		"\ })
-"deoplete-go
-	"let g:deoplete#sources#go#pointer = 1
-	"let g:deoplete#sources#go#gocode_binary = $GOPATH.'/bin/gocode'
-	"let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const']
-	"autocmd Bufwrite * silent! pclose!
-"vim-go
-	"autocmd BufEnter *.go nnoremap <C-i> :GoDef<CR>
-	"autocmd BufEnter *.go nnoremap <M-i> :GoDef<CR>
-	"autocmd BufEnter *.go nnoremap <C-LeftMouse> <LeftMouse>:GoDef<CR>
-	"autocmd BufEnter *.go vnoremap <C-LeftMouse> <Esc><LeftMouse>:GoDef<CR>
-	"autocmd BufEnter *.go nnoremap <M-LeftMouse> <LeftMouse>:GoDef<CR>
-	"autocmd BufEnter *.go vnoremap <M-LeftMouse> <Esc><LeftMouse>:GoDef<CR>
-	"nmap <M-o> <C-o>
-	"let g:go_def_mapping_enabled=0
-	"let g:go_def_mode='godef'
-	"解决折叠问题
-	"let g:go_fmt_experimental=1
-"languageclient-neovim
-	"log设置
-	"let g:LanguageClient_loggingFile=expand('~/.config/nvim/LanguageClient.log')
-	"let g:LanguageClient_loggingLevel='WARN'
-	"输入间隔超过多少秒会进行languageserver检测
-	"let g:LanguageClient_changeThrottle=0.2
-	"languageserver超时时间
-	"let g:LanguageClient_waitOutputTimeout=5
-	"let g:LanguageClient_rootMarkers={
-		"\ 'go':['.git','go.mod'],
-		"\ }
-	"let g:LanguageClient_serverCommands={
-		"\ 'go':['bingo'],
-		"\ }
-	"autocmd BufWrite *.go call LanguageClient_textDocument_formatting()
-	"nnoremap <C-i> :call LanguageClient_textDocument_definition()<CR>
-	"nnoremap <M-i> :call LanguageClient_textDocument_definition()<CR>
-	"nnoremap <C-LeftMouse> <LeftMouse>:call LanguageClient_textDocument_definition()<CR>
-	"vnoremap <C-LeftMouse> <Esc><LeftMouse>:call LanguageClient_textDocument_definition()<CR>
-	"nnoremap <M-LeftMouse> <LeftMouse>:call LanguageClient_textDocument_definition()<CR>
-	"vnoremap <M-LeftMouse> <Esc><LeftMouse>:call LanguageClient_textDocument_definition()<CR>
-	"nnoremap <M-o> <C-o>
 "ale
-	"let g:ale_enabled=1
+	let g:ale_enabled=1
 	"lint
 	let g:ale_lint_on_text_changed=0
 	let g:ale_lint_on_insert_leave=0
@@ -67,18 +18,31 @@ call plug#end()
 	let g:ale_lint_on_save=1
 	let g:ale_lint_on_filetype_changed=1
 	let g:ale_linters={
-		\ 'go':['bingo','gofmt','golint','go vet'],
+		\ 'c':['clangd'],
+		\ 'cpp':['clangd'],
+		\ 'go':['gopls','gofmt','golint','govet'],
+		\ 'proto':['protoc-gen-lint'],
+		\ 'lua':['luac'],
+		\ 'sh':['shell'],
 		\ }
 	let g:ale_linters_explict=1
 	"fix
 	let g:ale_fix_on_save=1
 	let g:ale_fixers={
 		\ '*':['remove_trailing_lines','trim_whitespace'],
-		\ 'go':['gofmt'],
+		\ 'c':['clang-format'],
+		\ 'cpp':['clang-format'],
+		\ 'go':['gofmt','goimports'],
+		\ 'sh':['shfmt'],
 		\ }
 	"lsp
+	let g:ale_lsp_root={
+		\ 'gopls':$GOPATH,
+		\ }
 	let g:ale_completion_enabled=1
 	let g:ale_completion_delay=100
+	let g:ale_completion_max_suggestions=100
+	"代码跳转
 	nnoremap <C-i> :ALEGoToDefinition<CR>
 	nnoremap <M-i> :ALEGoToDefinition<CR>
 	nnoremap <C-LeftMouse> :ALEGoToDefinition<CR>
@@ -86,6 +50,30 @@ call plug#end()
 	nnoremap <M-LeftMouse> :ALEGoToDefinition<CR>
 	vnoremap <M-LeftMouse> :ALEGoToDefinition<CR>
 	nnoremap <M-o> <C-o>
+	"优先尝试搜索匹配，然后尝试搜索错误和警告
+	function SearchNext()
+		let s:bl=line(".")
+		let s:bc=col(".")
+		silent! execute "normal! /\<CR>"
+		let s:al=line(".")
+		let s:ac=col(".")
+		if s:bl == s:al && s:bc == s:ac
+			silent! execute "normal! :ALENextWrap\<CR>"
+		endif
+	endfunction
+	"优先尝试搜索匹配，然后尝试搜索错误和警告
+	function SearchPrev()
+		let s:bl=line(".")
+		let s:bc=col(".")
+		silent! execute "normal! ?\<CR>"
+		let s:al=line(".")
+		let s:ac=col(".")
+		if s:bl == s:al && s:bc == s:ac
+			silent! execute "normal! :ALEPreviousWrap\<CR>"
+		endif
+	endfunction
+	nnoremap <silent> n :call SearchNext()<CR>
+	nnoremap <silent> N :call SearchPrev()<CR>
 "neosnippet
 	let g:netsnippet#enable_snipmate_compatibility=1
 	let g:neosnippet#snippets_directory='~/.config/nvim/plugs/vim-snippets/snippets'
@@ -101,9 +89,7 @@ call plug#end()
 	let g:bufferline_show_bufnr=0
 	let g:bufferline_solo_highlight=0
 	let g:bufferline_echo=0
-	autocmd VimEnter *
-		\ let &statusline='%{bufferline#refresh_status()}'
-		\ .bufferline#get_status_string()
+	autocmd VimEnter * let &statusline='%{bufferline#refresh_status()}' .bufferline#get_status_string().'%<%=%r %m %f %-5.15(%l,%c-%v%) %p%%'
 "Color
 	colorscheme gruvbox
 	set termguicolors
@@ -305,13 +291,13 @@ set foldlevel=2
 function FoldSwitch()
 	if foldclosed(line("."))<0
 		if foldlevel(line("."))>0
-			execute "normal zc"
+			execute "normal! zc"
 		endif
 	else
-		exec "normal zo"
+		exec "normal! zo"
 	endif
 endfunction
-nnoremap <space> :call FoldSwitch()<CR>
+nnoremap <silent> <space> :call FoldSwitch()<CR>
 "设置鼠标使用
 set mouse=a
 "移动到行尾自动换行
@@ -327,8 +313,8 @@ endfunction
 autocmd InsertLeave * call Fcitx2en()
 
 "注释
-nnoremap ; :call SetComment()<CR>
-vnoremap ; :<BS><BS><BS><BS><BS>call SetCommentV()<CR>
+nnoremap <silent> ; :call SetComment()<CR>
+vnoremap <silent> ; :<BS><BS><BS><BS><BS>call SetCommentV()<CR>
 function SetComment()
 	let s:filename=expand("%:t")
 	let s:lastindex=strridx(s:filename,".")
@@ -426,32 +412,32 @@ function SetComment()
 	call cursor(s:lineindex,s:count+1)
 	if s:isComment==1
 		if s:type==".html"
-			execute "normal kdd"
-			execute "normal jddk"
+			execute "normal! kdd"
+			execute "normal! jddk"
 		elseif s:type==".vim"||s:type==".sh"
-			execute "normal x"
+			execute "normal! x"
 		elseif s:type==".go"||s:type==".js"||s:type==".lua"
-			execute "normal xx"
+			execute "normal! xx"
 		elseif s:type==".h"||s:type==".hpp"||s:type==".hxx"||s:type==".c"||s:type==".cc"||s:type==".cpp"||s:type==".cxx"||s:type==".C"||s:type==".c++"
-			execute "normal xx"
+			execute "normal! xx"
 		endif
 	elseif s:isComment==0
 		if s:type==".html"
-			execute "normal O<!--"
+			execute "normal! O<!--"
 			let s:temp=join(split(getline(line(".")),">"),"")
 			call setline(line("."),s:temp)
-			execute "normal jo-->"
-			execute "normal k"
+			execute "normal! jo-->"
+			execute "normal! k"
 		elseif s:type==".sh"
-			execute "normal i#"
+			execute "normal! i#"
 		elseif s:type==".vim"
-			execute "normal i\""
+			execute "normal! i\""
 		elseif s:type==".go"||s:type==".js"
-			execute "normal i//"
+			execute "normal! i//"
 		elseif s:type==".h"||s:type==".hpp"||s:type==".hxx"||s:type==".c"||s:type==".cc"||s:type==".cpp"||s:type==".cxx"||s:type==".C"||s:type==".c++"
-			execute "normal i//"
+			execute "normal! i//"
 		elseif s:type==".lua"
-			execute "normal i--"
+			execute "normal! i--"
 		endif
 	endif
 endfunction
@@ -471,14 +457,14 @@ function SetCommentV()
 			call SetComment()
 		elseif s:type==".go"||s:type==".js"
 			call cursor(s:beginline,s:begincol)
-			execute "normal i/*"
+			execute "normal! i/*"
 			call cursor(s:endline,s:endcol+2)
-			execute "normal a*/"
+			execute "normal! a*/"
 		elseif s:type==".h"||s:type==".hpp"||s:type==".hxx"||s:type==".c"||s:type==".cc"||s:type==".cpp"||s:type==".cxx"||s:type==".C"||s:type==".c++"
 			call cursor(s:beginline,s:begincol)
-			execute "normal i/*"
+			execute "normal! i/*"
 			call cursor(s:endline,s:endcol+2)
-			execute "normal a*/"
+			execute "normal! a*/"
 		elseif s:type==".lua"
 			let s:str=getline(s:beginline)
 			let s:front=strpart(s:str,0,s:begincol-1)
@@ -493,26 +479,26 @@ function SetCommentV()
 			execute s:beginline.",".s:endline."s/^/\"/"
 		elseif s:type==".html"
 			call cursor(s:beginline,0)
-			execute "normal O<!--"
+			execute "normal! O<!--"
 			call setline(line("."),join(split(getline(line(".")),">"),""))
 			call cursor(s:endline+1,0)
-			execute "normal o-->"
+			execute "normal! o-->"
 		elseif s:type==".go"||s:type==".js"
 			call cursor(s:beginline,0)
-			execute "normal O/*"
+			execute "normal! O/*"
 			call cursor(s:endline+1,0)
-			execute "normal o*/"
+			execute "normal! o*/"
 		elseif s:type==".h"||s:type==".hpp"||s:type==".hxx"||s:type==".c"||s:type==".cc"||s:type==".cpp"||s:type==".cxx"||s:type==".C"||s:type==".c++"
 			call cursor(s:beginline,0)
-			execute "normal O/*"
+			execute "normal! O/*"
 			call cursor(s:endline+1,0)
-			execute "normal o*/"
+			execute "normal! o*/"
 		elseif s:type==".lua"
 			call cursor(s:beginline,0)
-			execute "normal O--[["
+			execute "normal! O--[["
 			call setline(line("."),join(split(getline(line(".")),"]"),""))
 			call cursor(s:endline+1,0)
-			execute "normal o--]]"
+			execute "normal! o--]]"
 		endif
 	endif
 endfunction
