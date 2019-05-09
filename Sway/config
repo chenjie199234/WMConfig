@@ -1,5 +1,5 @@
 ### Global
-    font pango:Noto Sans CJK SC 12
+    font Source Code Pro Regular 11
     set $mod Mod4
     floating_modifier $mod normal
 ### Output
@@ -153,7 +153,7 @@
     client.unfocused #00000000 #4682B480 #0000CD #FF0000 #FFC0CB
 # Status Bar:
 bar {
-    separator_symbol " :|: "
+    separator_symbol ":|:"
     status_command "~/.config/sway/bin/bar"
     position top
     colors {

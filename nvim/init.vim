@@ -164,8 +164,8 @@ nnoremap <C-p> <NOP>
 nnoremap - <NOP>
 "Q_tm
 "重设单词移动
-nnoremap <M-h> B
-nnoremap <M-l> W
+nnoremap <M-h> b
+nnoremap <M-l> w
 "取消单词移动，大写是以空格为分隔符
 nnoremap w <NOP>
 nnoremap W <NOP>
@@ -212,11 +212,6 @@ nnoremap <C-j> <PageDown>
 "重新设定ctrl-k为向上翻一整页
 nnoremap <C-k> <PageUp>
 nnoremap <C-b> <NOP>
-"重新设定alt-j为向下翻半页
-nnoremap <C-M-j> <C-d>
-"重新设定alt-k为向下翻半页
-nnoremap <C-M-k> <C-u>
-nnoremap <C-u> <NOP>
 "取消绘制当前行到屏幕顶部中部或下部的重复的快捷键，使用zt,zz,zb代替
 nnoremap z<CR> <NOP>
 nnoremap z. <NOP>
@@ -263,7 +258,7 @@ nnoremap wq :wq<CR>
 nnoremap ZZ <NOP>
 "Q_wi
 nnoremap <M-w> <C-w>w
-nnoremap <C-w> <NOP>
+nnoremap <C-w> <C-w>w
 "Q_bu
 nnoremap <M-d> :bd<CR>
 nnoremap <C-d> :bd<CR>
