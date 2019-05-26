@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
@@ -22,8 +23,11 @@ type netcard struct {
 
 var json string
 var count int
+var zone = flag.Bool("z", false, "Output the time zone info")
+var battery = flag.Bool("b", false, "Output the battery info")
 
 func main() {
+	flag.Parse()
 	lastnetup := make(map[string]uint64)
 	lastnetdown := make(map[string]uint64)
 
@@ -129,73 +133,75 @@ func main() {
 		}
 		//disk io
 		{
-			stats, e := disk.IOCounters()
-			if e == nil {
+			fn := func(disk_name string, stat disk.IOCountersStat) {
+				read := float64(0)
+				write := float64(0)
+				if _, ok := lastdiskread[disk_name]; ok {
+					read = float64(stat.ReadBytes - lastdiskread[disk_name])
+					write = float64(stat.WriteBytes - lastdiskwrite[disk_name])
+				} else {
+					read = float64(stat.ReadBytes)
+					write = float64(stat.WriteBytes)
+				}
+				lastdiskread[disk_name] = stat.ReadBytes
+				lastdiskwrite[disk_name] = stat.WriteBytes
+				text := disk_name + ":R:"
+				unit := "B/s"
+				if read >= 1024.0 {
+					unit = "K/s"
+					read /= 1024.0
+					if read >= 1024.0 {
+						unit = "M/s"
+						read /= 1024.0
+						if read >= 1024.0 {
+							unit = "G/s"
+							read /= 1024.0
+						}
+					}
+				}
+				text += strconv.FormatFloat(read, 'f', 2, 64) + unit + " W:"
+				unit = "B/s"
+				if write >= 1024.0 {
+					unit = "K/s"
+					write /= 1024.0
+					if write >= 1024.0 {
+						unit = "M/s"
+						write /= 1024.0
+						if write >= 1024.0 {
+							unit = "G/s"
+							write /= 1024.0
+						}
+					}
+				}
+				text += strconv.FormatFloat(write, 'f', 2, 64) + unit
+				setjson(disk_name, text)
+			}
+			if stats, e := disk.IOCounters(); e == nil {
 				id := 96
 				for id < 122 {
 					id++
 					disk_name := "sd" + string(id)
 					if stat, ok := stats[disk_name]; ok {
-						read := float64(0)
-						write := float64(0)
-						if _, ok := lastdiskread[disk_name]; ok {
-							read = float64(stat.ReadBytes - lastdiskread[disk_name])
-							write = float64(stat.WriteBytes - lastdiskwrite[disk_name])
-						} else {
-							read = float64(stat.ReadBytes)
-							write = float64(stat.WriteBytes)
-						}
-						lastdiskread[disk_name] = stat.ReadBytes
-						lastdiskwrite[disk_name] = stat.WriteBytes
-						text := disk_name + ":R:"
-						unit := "B/s"
-						if read >= 1024.0 {
-							unit = "K/s"
-							read /= 1024.0
-							if read >= 1024.0 {
-								unit = "M/s"
-								read /= 1024.0
-								if read >= 1024.0 {
-									unit = "G/s"
-									read /= 1024.0
-								}
-							}
-						}
-						text += strconv.FormatFloat(read, 'f', 2, 64) + unit + " W:"
-						unit = "B/s"
-						if write >= 1024.0 {
-							unit = "K/s"
-							write /= 1024.0
-							if write >= 1024.0 {
-								unit = "M/s"
-								write /= 1024.0
-								if write >= 1024.0 {
-									unit = "G/s"
-									write /= 1024.0
-								}
-							}
-						}
-						text += strconv.FormatFloat(write, 'f', 2, 64) + unit
-						setjson(disk_name, text)
+						fn(disk_name, stat)
 					} else {
 						delete(lastdiskread, disk_name)
 						delete(lastdiskwrite, disk_name)
 					}
 				}
-			}
-		}
-		//cpu
-		{
-			stat, e := cpu.Percent(0, false)
-			if e == nil {
-				setjson("cpu", "cpu:"+strconv.FormatFloat(stat[0], 'f', 2, 64)+"%")
-			}
-		}
-		//mem
-		{
-			stat, e := mem.VirtualMemory()
-			if e == nil {
-				setjson("mem", "mem:"+strconv.FormatFloat(stat.UsedPercent, 'f', 2, 64)+"%")
+				id = 96
+				for id < 122 {
+					id++
+					disk_name := "hda" + string(id)
+					if stat, ok := stats[disk_name]; ok {
+						fn(disk_name, stat)
+					} else {
+						delete(lastdiskread, disk_name)
+						delete(lastdiskwrite, disk_name)
+					}
+				}
+				if stat, ok := stats["mmcblk0"]; ok {
+					fn("mmcblk0", stat)
+				}
 			}
 		}
 		//music
@@ -254,51 +260,80 @@ func main() {
 			}
 		}
 	NOMUSIC:
+		//cpu
+		if stat, e := cpu.Percent(0, false); e == nil {
+			setjson("cpu", "cpu:"+strconv.FormatFloat(stat[0], 'f', 2, 64)+"%")
+		}
+		//mem
+		if stat, e := mem.VirtualMemory(); e == nil {
+			setjson("mem", "mem:"+strconv.FormatFloat(stat.UsedPercent, 'f', 2, 64)+"%")
+		}
+		//sound
+		cmd := exec.Command("pamixer", "--get-volume")
+		if v, e := cmd.Output(); e == nil {
+			if v[len(v)-1] == '\n' {
+				v = v[:len(v)-1]
+			}
+			v = bytes.ToLower(v)
+			sound := append([]byte{'v', 'o', 'l', ':'}, v...)
+			setjson("sound", sound)
+		}
+		if *battery {
+			//battery
+			_, e := os.Lstat("/sys/class/power_supply/BAT0")
+			if e == nil {
+				bc, _ := ioutil.ReadFile("/sys/class/power_supply/BAT0/capacity")
+				if bc[len(bc)-1] == '\n' {
+					bc = bc[:len(bc)-1]
+				}
+				bc = append(bc, '%')
+				bs, _ := ioutil.ReadFile("/sys/class/power_supply/BAT0/status")
+				if bs[len(bs)-1] == '\n' {
+					bs = bs[:len(bs)-1]
+				}
+				bc = append([]byte{'c', 'a', 'p', ':'}, bc...)
+				if bs = bytes.ToLower(bs); !bytes.Equal(bs, []byte("full")) {
+					bc = append(bc, ' ')
+					bc = append(bc, bs...)
+				}
+				setjson("battery", bc)
+			}
+		}
+		//time
 		now := time.Now()
+		if *zone {
+			//time zone
+			z, offset := now.Zone()
+			if offset < 0 {
+				z += "-"
+				offset = -offset
+			} else {
+				z += "+"
+			}
+			offset_h := offset / 60 / 60
+			offset_m := offset / 60 % 60
+			if offset_h >= 10 {
+				z += strconv.Itoa(offset_h)
+			} else {
+				z += "0"
+				z += strconv.Itoa(offset_h)
+			}
+			z += ":"
+			if offset_m >= 10 {
+				z += strconv.Itoa(offset_m)
+			} else {
+				z += "0"
+				z += strconv.Itoa(offset_m)
+			}
+			setjson("zone", z)
+		}
+		//day and time
 		d := now.Format("06-01-02")
 		t := now.Format("15:04:05")
 		w := now.Weekday().String()[:3]
-		z, offset := now.Zone()
-		if offset < 0 {
-			z += "-"
-			offset = -offset
-		} else {
-			z += "+"
-		}
-		offset_h := offset / 60 / 60
-		offset_m := offset / 60 % 60
-		if offset_h >= 10 {
-			z += strconv.Itoa(offset_h)
-		} else {
-			z += "0"
-			z += strconv.Itoa(offset_h)
-		}
-		z += ":"
-		if offset_m >= 10 {
-			z += strconv.Itoa(offset_m)
-		} else {
-			z += "0"
-			z += strconv.Itoa(offset_m)
-		}
 		setjson("day", d+" "+w)
-		setjson("zone", z)
 		setjson("time", t)
-		_, e := os.Lstat("/sys/class/power_supply/BAT0")
-		if e == nil {
-			bc, _ := ioutil.ReadFile("/sys/class/power_supply/BAT0/capacity")
-			if bc[len(bc)-1] == '\n' {
-				bc = bc[:len(bc)-1]
-			}
-			bc = append(bc, '%')
-			bs, _ := ioutil.ReadFile("/sys/class/power_supply/BAT0/status")
-			if bs[len(bs)-1] == '\n' {
-				bs = bs[:len(bs)-1]
-			}
-			setjson("batterycap", bc)
-			if bs = bytes.ToLower(bs); !bytes.Equal(bs, []byte("full")) {
-				setjson("batterystate", bs)
-			}
-		}
+		//output
 		json = "," + json
 		fmt.Println(json)
 	}

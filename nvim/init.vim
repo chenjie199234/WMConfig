@@ -11,6 +11,9 @@ Plug 'bling/vim-bufferline'
 call plug#end()
 "ale
 	let g:ale_enabled=1
+	let g:ale_set_loclist=1
+	let g:ale_set_quickfix=0
+	let g:ale_set_signs=1
 	"lint
 	let g:ale_lint_on_text_changed=0
 	let g:ale_lint_on_insert_leave=0
@@ -21,6 +24,7 @@ call plug#end()
 		\ 'c':['clangd'],
 		\ 'cpp':['clangd'],
 		\ 'go':['gopls','gofmt','golint','govet'],
+		\ 'javascript':['eslint'],
 		\ 'proto':['protoc-gen-lint'],
 		\ 'lua':['luac'],
 		\ 'sh':['shell'],
@@ -32,7 +36,8 @@ call plug#end()
 		\ '*':['remove_trailing_lines','trim_whitespace'],
 		\ 'c':['clang-format'],
 		\ 'cpp':['clang-format'],
-		\ 'go':['gofmt','goimports'],
+		\ 'go':['gofmt','goimports','gomod'],
+		\ 'javascript':['eslint'],
 		\ 'sh':['shfmt'],
 		\ }
 	"lsp
@@ -94,6 +99,8 @@ call plug#end()
 	colorscheme gruvbox
 	set termguicolors
 	set background=dark
+	"取消gruvbox的背景颜色,使用term自带的背景颜色,以此来使用透明背景
+	hi normal guibg=none ctermbg=none
 "NERDTree
 	nnoremap <M-f> :NERDTreeToggle<CR>
 	nnoremap <C-f> :NERDTreeToggle<CR>
@@ -297,7 +304,6 @@ nnoremap <silent> <space> :call FoldSwitch()<CR>
 set mouse=a
 "移动到行尾自动换行
 set whichwrap=h,l,<,>
-
 "vim退出编辑模式时关闭fcitx的中文输入
 function Fcitx2en()
 	let s:input_status=system("fcitx-remote")

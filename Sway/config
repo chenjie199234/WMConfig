@@ -154,7 +154,7 @@
 # Status Bar:
 bar {
     separator_symbol ":|:"
-    status_command "~/.config/sway/bin/bar"
+    status_command "~/.config/sway/bin/bar -b"
     position top
     colors {
         background #80808080
