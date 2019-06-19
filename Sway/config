@@ -29,12 +29,14 @@
         natural_scroll disabled
     }
 ### Default start program when start sway
+    exec aria2c
     exec fcitx 1> /dev/null 2>&1
     exec ~/Tools/ShadowSocks/shadowsocks-local 1> /dev/null 2>&1
     exec mocp -M ~/.config/moc -m ~/Music -S 1> /dev/null 2>&1
     exec swayidle -w timeout 300 'swaylock -f -i $bglock -s fill' timeout 600 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"'
 ### Interface
     # general
+    for_window [shell=".*"] inhibit_idle	fullscreen
     gaps				inner 5
     gaps				outer 5
     default_border			pixel 3

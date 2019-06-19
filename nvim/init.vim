@@ -11,9 +11,11 @@ Plug 'bling/vim-bufferline'
 call plug#end()
 "ale
 	let g:ale_enabled=1
+	let g:ale_sign_error='>x'
+	let g:ale_sign_warning='>!'
 	let g:ale_set_loclist=1
 	let g:ale_set_quickfix=0
-	let g:ale_set_signs=1
+	let g:ale_open_list=0
 	"lint
 	let g:ale_lint_on_text_changed=0
 	let g:ale_lint_on_insert_leave=0
