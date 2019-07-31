@@ -1,7 +1,7 @@
 "设置插件
 set filetype=off
 call plug#begin('~/.config/nvim/plugs')
-Plug 'w0rp/ale'
+Plug 'dense-analysis/ale'
 Plug 'Shougo/neosnippet.vim'
 Plug 'Shougo/neosnippet-snippets'
 Plug 'scrooloose/nerdtree'
@@ -23,8 +23,8 @@ call plug#end()
 	let g:ale_lint_on_save=1
 	let g:ale_lint_on_filetype_changed=1
 	let g:ale_linters={
-		\ 'c':['clangd'],
-		\ 'cpp':['clangd'],
+		\ 'c':['clang','clangd'],
+		\ 'cpp':['clang','clangd'],
 		\ 'go':['gopls','gofmt','golint','govet'],
 		\ 'javascript':['eslint'],
 		\ 'proto':['protoc-gen-lint'],
@@ -36,16 +36,18 @@ call plug#end()
 	let g:ale_fix_on_save=1
 	let g:ale_fixers={
 		\ '*':['remove_trailing_lines','trim_whitespace'],
-		\ 'c':['clang-format'],
-		\ 'cpp':['clang-format'],
+		\ 'c':['clang-format','uncrustify'],
+		\ 'cpp':['clang-format','uncrustify'],
 		\ 'go':['gofmt','goimports','gomod'],
 		\ 'javascript':['eslint'],
 		\ 'sh':['shfmt'],
 		\ }
 	"lsp
-	let g:ale_lsp_root={
-		\ 'gopls':$GOPATH,
-		\ }
+	if $GO111MODULE!="on"
+		let g:ale_lsp_root={
+			\ 'gopls':$GOPATH,
+			\ }
+	endif
 	let g:ale_completion_enabled=1
 	let g:ale_completion_delay=100
 	let g:ale_completion_max_suggestions=100
