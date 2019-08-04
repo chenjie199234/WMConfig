@@ -31,12 +31,13 @@
 ### Default start program when start sway
     exec aria2c
     exec fcitx 1> /dev/null 2>&1
-    exec ~/Tools/ShadowSocks/shadowsocks-local 1> /dev/null 2>&1
+    #exec ~/Tools/ShadowSocks/shadowsocks-local 1> /dev/null 2>&1
     exec mocp -M ~/.config/moc -m ~/Music -S 1> /dev/null 2>&1
     exec swayidle -w timeout 300 'swaylock -f -i $bglock -s fill' timeout 600 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"'
 ### Interface
     # general
     for_window [shell=".*"] inhibit_idle	fullscreen
+    #xwayland				disable
     gaps				inner 5
     gaps				outer 5
     default_border			pixel 3
@@ -74,20 +75,16 @@
     # start gimp
     bindsym $mod+6			exec gimp
     # control music player by key
-    bindsym F4 				exec mocp -M ~/.config/moc -r 2> /dev/null
-    bindsym XF86AudioPrev 		exec mocp -M ~/.config/moc -r 2> /dev/null
-    bindsym F5 				exec mocp -M ~/.config/moc -G 2> /dev/null
-    bindsym XF86AudioPlay 		exec mocp -M ~/.config/moc -G 2> /dev/null
-    bindsym XF86AudioStop 		exec mocp -M ~/.config/moc -G 2> /dev/null
-    bindsym F6 				exec mocp -M ~/.config/moc -f 2> /dev/null
-    bindsym XF86AudioNext 		exec mocp -M ~/.config/moc -f 2> /dev/null
+    bindsym $mod+F4			exec mocp -M ~/.config/moc -r 2> /dev/null
+    bindsym $mod+F5 			exec mocp -M ~/.config/moc -G 2> /dev/null
+    bindsym $mod+F6 			exec mocp -M ~/.config/moc -f 2> /dev/null
     # control audio by key
-    bindsym F1 				exec pamixer -t
-    bindsym XF86AudioMute 		exec pamixer -t
-    bindsym F2 				exec pamixer -d 5
-    bindsym XF86AudioLowerVolume 	exec pamixer -d 5
-    bindsym F3 				exec pamixer -i 5
-    bindsym XF86AudioRaiseVolume 	exec pamixer -i 5
+    bindsym $mod+F1			exec pamixer			-t
+    bindsym $mod+Ctrl+F1		exec pamixer --default-source	-t
+    bindsym $mod+F2			exec pamixer 			-d 5
+    bindsym $mod+Ctrl+F2		exec pamixer --default-source	-d 5
+    bindsym $mod+F3 			exec pamixer			-i 5
+    bindsym $mod+Ctrl+F3 		exec pamixer --default-source	-i 5
     # toggle fullscreen
     bindsym $mod+f 			fullscreen
 ### Moving around:

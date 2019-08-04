@@ -269,15 +269,45 @@ func main() {
 			setjson("mem", "mem:"+strconv.FormatFloat(stat.UsedPercent, 'f', 2, 64)+"%")
 		}
 		//sound
-		cmd := exec.Command("pamixer", "--get-volume")
-		if v, e := cmd.Output(); e == nil {
+		sound := []byte{'v', 'o', 'l', '('}
+		out := []byte{'o', 'u', 't', ':'}
+		in := []byte{'i', 'n', ':'}
+		//don't known why,when the sound is muted cmd run will return error
+		cmd := exec.Command("pamixer", "--get-volume-human")
+		if v, _ := cmd.Output(); len(v) != 0 {
 			if v[len(v)-1] == '\n' {
 				v = v[:len(v)-1]
 			}
+			if v[len(v)-1] == '%' {
+				v = v[:len(v)-1]
+			}
 			v = bytes.ToLower(v)
-			sound := append([]byte{'v', 'o', 'l', ':'}, v...)
-			setjson("sound", sound)
+			out = append(out, v...)
 		}
+		cmd = exec.Command("pamixer", "--default-source", "--get-volume-human")
+		if v, _ := cmd.Output(); len(v) != 0 {
+			if v[len(v)-1] == '\n' {
+				v = v[:len(v)-1]
+			}
+			if v[len(v)-1] == '%' {
+				v = v[:len(v)-1]
+			}
+			v = bytes.ToLower(v)
+			in = append(in, v...)
+		}
+		if len(out) == 4 {
+			sound = append(sound, []byte{'e', 'r', 'r', 'o', 'r'}...)
+		} else {
+			sound = append(sound, out...)
+		}
+		sound = append(sound, ',')
+		if len(in) == 3 {
+			sound = append(sound, []byte{'e', 'r', 'r', 'o', 'r'}...)
+		} else {
+			sound = append(sound, in...)
+		}
+		sound = append(sound, ')')
+		setjson("sound", sound)
 		if *battery {
 			//battery
 			_, e := os.Lstat("/sys/class/power_supply/BAT0")
