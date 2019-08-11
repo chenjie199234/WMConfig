@@ -29,7 +29,7 @@ call plug#end()
 		\ 'javascript':['eslint'],
 		\ 'proto':['protoc-gen-lint'],
 		\ 'lua':['luac'],
-		\ 'sh':['shell'],
+		\ 'sh':['language_server','shell'],
 		\ }
 	let g:ale_linters_explict=1
 	"fix
