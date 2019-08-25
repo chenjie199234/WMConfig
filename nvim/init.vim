@@ -40,7 +40,6 @@ call plug#end()
 		\ 'cpp':['clang-format','uncrustify'],
 		\ 'go':['gofmt','goimports','gomod'],
 		\ 'javascript':['eslint'],
-		\ 'sh':['shfmt'],
 		\ }
 	"lsp
 	if $GO111MODULE!="on"

@@ -31,7 +31,6 @@
 ### Default start program when start sway
     exec aria2c
     exec fcitx 1> /dev/null 2>&1
-    #exec ~/Tools/ShadowSocks/shadowsocks-local 1> /dev/null 2>&1
     exec mocp -M ~/.config/moc -m ~/Music -S 1> /dev/null 2>&1
     exec swayidle -w timeout 300 'swaylock -f -i $bglock -s fill' timeout 600 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"'
 ### Interface
@@ -74,6 +73,8 @@
     bindsym $mod+5			exec darktable 2> /dev/null
     # start gimp
     bindsym $mod+6			exec gimp
+    # start blender
+    bindsym $mod+7			exec blender
     # control music player by key
     bindsym $mod+F4			exec mocp -M ~/.config/moc -r 2> /dev/null
     bindsym $mod+F5 			exec mocp -M ~/.config/moc -G 2> /dev/null
@@ -87,6 +88,7 @@
     bindsym $mod+Ctrl+F3 		exec pamixer --default-source	-i 5
     # toggle fullscreen
     bindsym $mod+f 			fullscreen
+    bindsym $mod+Alt+f			floating toggle
 ### Moving around:
     # move focus in window
     bindsym $mod+h 			focus left
