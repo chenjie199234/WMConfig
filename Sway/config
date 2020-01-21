@@ -28,6 +28,12 @@
 	#enabled 双指向下滚，画面向上滚，双指向上滚，画面向下滚
         natural_scroll disabled
     }
+    input "9639:64097:Compx_2.4G_Receiver_Mouse" {
+	accel_profile adaptive
+	drag enabled
+	drag_lock enabled
+	pointer_accel 0
+    }
 ### Default start program when start sway
     exec aria2c
     exec fcitx 1> /dev/null 2>&1
@@ -71,10 +77,12 @@
     bindsym $mod+4			exec mocp -M ~/.config/moc -a ~/Music -p 2> /dev/null
     # start darktable
     bindsym $mod+5			exec darktable 2> /dev/null
+    # start hugin
+    bindsym $mod+6			exec hugin 2> /dev/null
     # start gimp
-    bindsym $mod+6			exec gimp
+    bindsym $mod+7			exec gimp 2> /dev/null
     # start blender
-    bindsym $mod+7			exec blender
+    bindsym $mod+8			exec blender 2> /dev/null
     # control music player by key
     bindsym $mod+F4			exec mocp -M ~/.config/moc -r 2> /dev/null
     bindsym $mod+F5 			exec mocp -M ~/.config/moc -G 2> /dev/null
@@ -143,8 +151,8 @@
     bindsym $mod+Shift+Backspace 	mode "exit-sway"
     mode "exit-sway" {
         # confirm
-	bindsym y 		exec pkill shadowsocks;exec pkill mocp;exec pkill jackd;exit
-	bindsym Return 		exec pkill shadowsocks;exec pkill mocp;exec pkill jackd;exit
+	bindsym y 		exec pkill mocp;exit
+	bindsym Return 		exec pkill mocp;exit
 	# cancel
 	bindsym n 		mode "default"
 	bindsym Escape 		mode "default"
