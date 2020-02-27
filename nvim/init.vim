@@ -90,11 +90,20 @@ nnoremap zh <NOP>
 nnoremap zl <NOP>
 nnoremap zH <NOP>
 nnoremap zL <NOP>
-"插入模式下移动快捷键
-inoremap <NL> <NOP>
+"插入模式下移动快捷键,以及补全快捷键
 inoremap <expr><C-j> pumvisible() ? "\<C-n>" : "\<Down>"
 inoremap <expr><C-k> pumvisible() ? "\<C-p>" : "\<Up>"
-inoremap <expr> <TAB> coc#expandableOrJumpable()?"\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>":"\<TAB>"
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? coc#_select_confirm() :
+      \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+let g:coc_snippet_next = '<tab>'
 inoremap <C-h> <Left>
 inoremap <C-l> <Right>
 inoremap <C-o> <Esc>o
