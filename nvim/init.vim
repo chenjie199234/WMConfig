@@ -1,63 +1,131 @@
 "设置插件
 set filetype=off
-call plug#begin('~/.config/nvim/plugs')
-Plug 'dense-analysis/ale'
-Plug 'Shougo/neosnippet.vim'
-Plug 'Shougo/neosnippet-snippets'
+call plug#begin($HOME..'/.config/nvim/plugs')
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'honza/vim-snippets'
 Plug 'scrooloose/nerdtree'
-Plug 'jiangmiao/auto-pairs'
 Plug 'morhetz/gruvbox'
 Plug 'bling/vim-bufferline'
 call plug#end()
-"ale
-	let g:ale_enabled=1
-	let g:ale_sign_error='>x'
-	let g:ale_sign_warning='>!'
-	let g:ale_set_loclist=1
-	let g:ale_set_quickfix=0
-	let g:ale_open_list=0
-	"lint
-	let g:ale_lint_on_text_changed=0
-	let g:ale_lint_on_insert_leave=0
-	let g:ale_lint_on_enter=1
-	let g:ale_lint_on_save=1
-	let g:ale_lint_on_filetype_changed=1
-	let g:ale_linters={
-		\ 'c':['clang','clangd'],
-		\ 'cpp':['clang','clangd'],
-		\ 'go':['gopls','gofmt','golint','govet'],
-		\ 'javascript':['eslint'],
-		\ 'proto':['protoc-gen-lint'],
-		\ 'lua':['luac'],
-		\ 'sh':['language_server','shell'],
-		\ }
-	let g:ale_linters_explict=1
-	"fix
-	let g:ale_fix_on_save=1
-	let g:ale_fixers={
-		\ '*':['remove_trailing_lines','trim_whitespace'],
-		\ 'c':['clang-format','uncrustify'],
-		\ 'cpp':['clang-format','uncrustify'],
-		\ 'go':['gofmt','goimports','gomod'],
-		\ 'javascript':['eslint'],
-		\ }
-	"lsp
-	if $GO111MODULE!="on"
-		let g:ale_lsp_root={
-			\ 'gopls':$GOPATH,
-			\ }
-	endif
-	let g:ale_completion_enabled=1
-	let g:ale_completion_delay=100
-	let g:ale_completion_max_suggestions=100
-	"代码跳转
-	nnoremap <C-i> :ALEGoToDefinition<CR>
-	nnoremap <M-i> :ALEGoToDefinition<CR>
-	nnoremap <C-LeftMouse> :ALEGoToDefinition<CR>
-	vnoremap <C-LeftMouse> :ALEGoToDefinition<CR>
-	nnoremap <M-LeftMouse> :ALEGoToDefinition<CR>
-	vnoremap <M-LeftMouse> :ALEGoToDefinition<CR>
-	nnoremap <M-o> <C-o>
+"从光标所在处删除到行首第一个非空字符
+nnoremap dh d^
+"从光标所在处删除到行尾部
+nnoremap dl d$
+"从光标所在处复制到行首第一个非空字符
+nnoremap yh y^
+"从光标所在处复制到行尾部
+nnoremap yl y$
+"重新设置跳转到文本行开头第一个非空字符
+nnoremap <C-h> ^
+"重新设置跳转到文本行尾
+nnoremap <C-l> $
+"取消在文本列中搜索指定字符，使用/搜索代替
+nnoremap t <NOP>
+nnoremap T <NOP>
+nnoremap f <NOP>
+nnoremap F <NOP>
+nnoremap ; <NOP>
+nnoremap , <NOP>
+"取消多余的向下移动快捷键
+nnoremap <C-j> <NOP>
+nnoremap <C-m> <NOP>
+nnoremap <C-n> <NOP>
+nnoremap + <NOP>
+"取消多余的向上移动快捷键
+nnoremap <C-p> <NOP>
+nnoremap - <NOP>
+"重设单词移动
+nnoremap <M-h> b
+nnoremap <M-l> w
+"取消单词移动，大写是以空格为分隔符
+nnoremap w <NOP>
+nnoremap W <NOP>
+nnoremap e <NOP>
+nnoremap E <NOP>
+nnoremap b <NOP>
+nnoremap B <NOP>
+nnoremap ge <NOP>
+nnoremap gE <NOP>
+"取消屏幕移动
+nnoremap % <NOP>
+nnoremap H <NOP>
+nnoremap M <NOP>
+nnoremap L <NOP>
+nnoremap go <NOP>
+"取消tag相关
+nnoremap <C-]> <NOP>
+nnoremap <C-t> <NOP>
+nnoremap <C-w>} <NOP>
+nnoremap <C-w>z <NOP>
+"取消ctrl-e屏幕单行滚动
+nnoremap <C-e> <NOP>
+nnoremap <C-y> <NOP>
+"重新设定ctrl-j为向下翻一整页
+nnoremap <C-j> <PageDown>
+nnoremap <C-f> <NOP>
+"重新设定ctrl-k为向上翻一整页
+nnoremap <C-k> <PageUp>
+nnoremap <C-b> <NOP>
+"操作回退
+nnoremap <C-u> <C-r>
+nnoremap <C-r> <NOP>
+"文件保存退出
+nnoremap ww :w<CR>
+nnoremap qq :q!<CR>
+nnoremap wq :wq<CR>
+nnoremap ZZ <NOP>
+"窗口移动
+nnoremap <M-w> <C-w>w
+nnoremap <C-w> <C-w>w
+"打开文件选择
+nnoremap <M-d> :bd<CR>
+nnoremap <C-d> :bd<CR>
+nnoremap <C-n> :bn<CR>
+nnoremap <M-n> :bp<CR>
+"取消绘制当前行到屏幕顶部中部或下部的重复的快捷键，使用zt,zz,zb代替
+nnoremap z<CR> <NOP>
+nnoremap z. <NOP>
+nnoremap z- <NOP>
+nnoremap zh <NOP>
+nnoremap zl <NOP>
+nnoremap zH <NOP>
+nnoremap zL <NOP>
+"插入模式下移动快捷键
+inoremap <NL> <NOP>
+inoremap <expr><C-j> pumvisible() ? "\<C-n>" : "\<Down>"
+inoremap <expr><C-k> pumvisible() ? "\<C-p>" : "\<Up>"
+inoremap <expr> <TAB> coc#expandableOrJumpable()?"\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>":"\<TAB>"
+inoremap <C-h> <Left>
+inoremap <C-l> <Right>
+inoremap <C-o> <Esc>o
+cnoremap <C-h> <Left>
+cnoremap <C-l> <Right>
+vnoremap <C-o> <Esc>o
+"缩进快捷键
+nnoremap , <h
+nnoremap . >l
+vnoremap , <h
+vnoremap . >l
+nnoremap <C-a> <NOP>
+nnoremap <C-c> <NOP>
+nnoremap <C-v> <NOP>
+nnoremap <C-x> <NOP>
+"terminal
+nnoremap <M-t> :botright split<CR>:terminal<CR>
+tnoremap <Esc> <C-\><C-n>
+tnoremap <M-w> <C-\><C-n><C-w>w
+"coc
+	let g:coc_config_home=$HOME..'/.config/nvim/plugs/coc.nvim'
+	let g:coc_data_home=$HOME..'/.config/nvim/plugs/coc.nvim/data'
+	let b:coc_root_patterns=[".git"]
+	"写入文件之前自动格式化代码
+	autocmd BufWritePre * call CocAction("format")
+	"<C-i>跳入
+	"<C-o>跳出
+	autocmd FileType go nmap <C-i> <Plug>(coc-definition)
+	"autocmd FileType go nmap <C-i> <Plug>(coc-declaration)
+	"autocmd FileType go nmap <C-i> <Plug>(coc-implementation)
+	"autocmd FileType go nmap <C-i> <Plug>(coc-type-definition)
 	"优先尝试搜索匹配，然后尝试搜索错误和警告
 	function SearchNext()
 		let s:bl=line(".")
@@ -66,7 +134,7 @@ call plug#end()
 		let s:al=line(".")
 		let s:ac=col(".")
 		if s:bl == s:al && s:bc == s:ac
-			silent! execute "normal! :ALENextWrap\<CR>"
+			call CocAction("diagnosticNext")
 		endif
 	endfunction
 	"优先尝试搜索匹配，然后尝试搜索错误和警告
@@ -77,22 +145,11 @@ call plug#end()
 		let s:al=line(".")
 		let s:ac=col(".")
 		if s:bl == s:al && s:bc == s:ac
-			silent! execute "normal! :ALEPreviousWrap\<CR>"
+			call CocAction("diagnosticPrevious")
 		endif
 	endfunction
 	nnoremap <silent> n :call SearchNext()<CR>
 	nnoremap <silent> N :call SearchPrev()<CR>
-"neosnippet
-	let g:netsnippet#enable_snipmate_compatibility=1
-	let g:neosnippet#snippets_directory='~/.config/nvim/plugs/vim-snippets/snippets'
-	imap <expr><TAB>     neosnippet#expandable_or_jumpable() ? "\<Plug>(neosnippet_expand_or_jump)":"\<TAB>"
-	smap <expr><TAB>     neosnippet#expandable_or_jumpable() ? "\<Plug>(neosnippet_expand_or_jump)":"\<TAB>"
-"auto-pairs
-	let g:AutoPairsMapCh=0
-	let g:AutoPairsShortcutToggle=''
-	let g:AutoPairsShortcutFastWrap=''
-	let g:AutoPairsShortcutJump=''
-	let g:AutoPairsShortcutBackInsert=''
 "bufferline
 	let g:bufferline_show_bufnr=0
 	let g:bufferline_solo_highlight=0
@@ -120,169 +177,8 @@ call plug#end()
 	let g:NERDTreeDirArrowCollapsible='<'
 	"自动删除不存在的buffer
 	let NERDTreeAutoDeleteBuffer=1
-"Q_de Q_cm
-"从光标所在处删除到行首第一个非空字符
-nnoremap dh d^
-"从光标所在处删除到行尾部
-nnoremap dl d$
-"从光标所在处复制到行首第一个非空字符
-nnoremap yh y^
-"从光标所在处复制到行尾部
-nnoremap yl y$
-"Q_lr
-"取消向左移动
-nnoremap <C-h> <NOP>
-nnoremap <BS> <NOP>
-"取消向右移动
-nnoremap <Space> <NOP>
-"取消跳转到文本行开头
-nnoremap 0 <NOP>
-nnoremap g0 <NOP>
-"重新设置跳转到屏幕行开头第一个非空字符
-nnoremap g<C-h> g^
-nnoremap g^ <NOP>
-"重新设置跳转到文本行开头第一个非空字符
-nnoremap <C-h> ^
-nnoremap ^ <NOP>
-"重新设置跳转到屏幕行尾
-nnoremap g<C-l> g$
-nnoremap g$ <NOP>
-"重新设置跳转到文本行尾
-nnoremap <C-l> $
-nnoremap $ <NOP>
-"取消跳转到屏幕行中间列
-nnoremap gm <NOP>
-"取消跳转到指定列
-nnoremap <Bar> <NOP>
-"取消在文本列中搜索指定字符，使用/搜索代替
-nnoremap t <NOP>
-nnoremap T <NOP>
-nnoremap f <NOP>
-nnoremap F <NOP>
-nnoremap ; <NOP>
-nnoremap , <NOP>
-"Q_ud
-"取消向下移动
-nnoremap <C-j> <NOP>
-nnoremap <C-m> <NOP>
-nnoremap <C-n> <NOP>
-nnoremap <NL> <NOP>
-nnoremap _ <NOP>
-nnoremap + <NOP>
-"取消向上移动
-nnoremap <C-p> <NOP>
-nnoremap - <NOP>
-"Q_tm
-"重设单词移动
-nnoremap <M-h> b
-nnoremap <M-l> w
-"取消单词移动，大写是以空格为分隔符
-nnoremap w <NOP>
-nnoremap W <NOP>
-nnoremap e <NOP>
-nnoremap E <NOP>
-nnoremap b <NOP>
-nnoremap B <NOP>
-nnoremap ge <NOP>
-nnoremap gE <NOP>
-nnoremap ) <NOP>
-nnoremap ( <NOP>
-nnoremap { <NOP>
-nnoremap } <NOP>
-nnoremap [[ <NOP>
-nnoremap ]] <NOP>
-nnoremap ][ <NOP>
-nnoremap [] <NOP>
-nnoremap [m <NOP>
-nnoremap [M <NOP>
-nnoremap ]m <NOP>
-nnoremap ]M <NOP>
-nnoremap [# <NOP>
-nnoremap ]# <NOP>
-"Q_vm
-"取消屏幕移动
-nnoremap % <NOP>
-nnoremap H <NOP>
-nnoremap M <NOP>
-nnoremap L <NOP>
-nnoremap go <NOP>
-"Q_ta
-"nnoremap <C-[> <C-t>
-nnoremap <C-]> <NOP>
-nnoremap <C-t> <NOP>
-nnoremap <C-w>} <NOP>
-nnoremap <C-w>z <NOP>
-"Q_sc
-"取消ctrl-e屏幕单行滚动
-nnoremap <C-e> <NOP>
-nnoremap <C-y> <NOP>
-"重新设定ctrl-j为向下翻一整页
-nnoremap <C-j> <PageDown>
-"nnoremap <C-f> <NOP>
-"重新设定ctrl-k为向上翻一整页
-nnoremap <C-k> <PageUp>
-nnoremap <C-b> <NOP>
-"取消绘制当前行到屏幕顶部中部或下部的重复的快捷键，使用zt,zz,zb代替
-nnoremap z<CR> <NOP>
-nnoremap z. <NOP>
-nnoremap z- <NOP>
-nnoremap zh <NOP>
-nnoremap zl <NOP>
-nnoremap zH <NOP>
-nnoremap zL <NOP>
-"Q_ss
-inoremap <NL> <NOP>
-inoremap <expr><C-j> pumvisible() ? "\<C-n>" : "\<Down>"
-inoremap <expr><C-k> pumvisible() ? "\<C-p>" : "\<Up>"
-inoremap <C-h> <Left>
-inoremap <C-l> <Right>
-inoremap <C-o> <Esc>o
-inoremap < <><ESC>i
-inoremap << <<
-cnoremap <C-h> <Left>
-cnoremap <C-l> <Right>
-vnoremap <C-o> <Esc>o
-"Q_ch
-nnoremap , <h
-nnoremap . >l
-vnoremap , <h
-vnoremap . >l
-nnoremap < <NOP>
-nnoremap << <NOP>
-nnoremap > <NOP>
-nnoremap >> <NOP>
-nnoremap <C-a> <NOP>
-nnoremap <C-c> <NOP>
-nnoremap <C-v> <NOP>
-nnoremap <C-x> <NOP>
-"Q_re
-nnoremap q <NOP>
-nnoremap gs <NOP>
-"Q_ur
-nnoremap <C-u> <C-r>
-nnoremap <C-r> <NOP>
-"Q_wq
-nnoremap ww :w<CR>
-nnoremap qq :q!<CR>
-nnoremap wq :wq<CR>
-nnoremap ZZ <NOP>
-"Q_wi
-nnoremap <M-w> <C-w>w
-nnoremap <C-w> <C-w>w
-"Q_bu
-nnoremap <M-d> :bd<CR>
-nnoremap <C-d> :bd<CR>
-inoremap <M-d> <ESC>:bd<CR>
-inoremap <C-d> <ESC>:bd<CR>
-nnoremap <M-k> :bp<CR>
-inoremap <M-k> <ESC>:bp<CR>
-nnoremap <M-j> :bn<CR>
-inoremap <M-j> <ESC>:bn<CR>
-"terminal
-nnoremap <M-t> :botright split<CR>:terminal<CR>
-tnoremap <Esc> <C-\><C-n>
-tnoremap <M-w> <C-\><C-n><C-w>w
-"Q_op
+set nobackup
+set nowritebackup
 "设置显示行号
 set number
 "设置搜索时对大小写的响应
