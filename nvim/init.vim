@@ -132,6 +132,11 @@ tnoremap <C-w> <C-\><C-n><C-w>w
 	let b:coc_root_patterns=[".git"]
 	"写入文件之前自动格式化代码
 	autocmd BufWritePre * call CocAction("format")
+	"显示光标所在信息
+	nmap ` :call CocAction("doHover")<CR>
+	"重命名变量
+	nmap <C-r> :call CocAction("rename")<CR>
+	nmap <M-r> :call CocAction("rename")<CR>
 	"<C-i> <M-i> 跳入
 	"<C-o> <M-o> 跳出
 	nmap <M-o> <C-o>
