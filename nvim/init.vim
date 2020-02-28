@@ -132,9 +132,11 @@ tnoremap <C-w> <C-\><C-n><C-w>w
 	let b:coc_root_patterns=[".git"]
 	"写入文件之前自动格式化代码
 	autocmd BufWritePre * call CocAction("format")
-	"<C-i>跳入
-	"<C-o>跳出
+	"<C-i> <M-i> 跳入
+	"<C-o> <M-o> 跳出
+	nmap <M-o> <C-o>
 	autocmd FileType go nmap <C-i> <Plug>(coc-definition)
+	autocmd FileType go nmap <M-i> <Plug>(coc-definition)
 	"autocmd FileType go nmap <C-i> <Plug>(coc-declaration)
 	"autocmd FileType go nmap <C-i> <Plug>(coc-implementation)
 	"autocmd FileType go nmap <C-i> <Plug>(coc-type-definition)
