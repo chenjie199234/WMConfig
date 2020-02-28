@@ -62,9 +62,11 @@ nnoremap <C-e> <NOP>
 nnoremap <C-y> <NOP>
 "重新设定ctrl-j为向下翻一整页
 nnoremap <C-j> <PageDown>
+nnoremap <M-j> <PageDown>
 nnoremap <C-f> <NOP>
 "重新设定ctrl-k为向上翻一整页
 nnoremap <C-k> <PageUp>
+nnoremap <M-k> <PageUp>
 nnoremap <C-b> <NOP>
 "操作回退
 nnoremap <C-u> <C-r>
@@ -120,9 +122,10 @@ nnoremap <C-c> <NOP>
 nnoremap <C-v> <NOP>
 nnoremap <C-x> <NOP>
 "terminal
-nnoremap <M-t> :botright split<CR>:terminal<CR>
+nnoremap tt :botright split<CR>:terminal<CR>
 tnoremap <Esc> <C-\><C-n>
 tnoremap <M-w> <C-\><C-n><C-w>w
+tnoremap <C-w> <C-\><C-n><C-w>w
 "coc
 	let g:coc_config_home=$HOME..'/.config/nvim/plugs/coc.nvim'
 	let g:coc_data_home=$HOME..'/.config/nvim/plugs/coc.nvim/data'
@@ -186,6 +189,7 @@ tnoremap <M-w> <C-\><C-n><C-w>w
 	let g:NERDTreeDirArrowCollapsible='<'
 	"自动删除不存在的buffer
 	let NERDTreeAutoDeleteBuffer=1
+"禁止使用备份
 set nobackup
 set nowritebackup
 "设置显示行号
