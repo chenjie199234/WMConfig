@@ -169,6 +169,8 @@ tnoremap <C-w> <C-\><C-n><C-w>w
 	endfunction
 	nnoremap <silent> n :call SearchNext()<CR>
 	nnoremap <silent> N :call SearchPrev()<CR>
+	nnoremap <C-/> :CocList -I grep -i<CR>
+	nnoremap <M-/> :CocList files<CR>
 "bufferline
 	let g:bufferline_show_bufnr=0
 	let g:bufferline_solo_highlight=0
