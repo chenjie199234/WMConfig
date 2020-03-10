@@ -180,6 +180,7 @@ set shortmess+=c
 		autocmd User lsp_setup call lsp#register_server({
 			\ 'name': 'gopls',
 			\ 'cmd': {server_info->['gopls']},
+			\ 'root_uri':{server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), ['go.mod','.git/']))},
 			\ 'whitelist': ['go'],
 			\ })
 		autocmd BufWritePre *.go silent LspDocumentFormatSync 
@@ -188,6 +189,7 @@ set shortmess+=c
 		autocmd User lsp_setup call lsp#register_server({
 			\ 'name': 'clangd',
 			\ 'cmd': {server_info->['clangd', '-background-index']},
+			\ 'root_uri':{server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), ['CMakeLists.txt','.git/']))},
 			\ 'whitelist': ['c', 'cpp', 'objc', 'objcpp'],
 			\ })
 	endif
@@ -195,7 +197,7 @@ set shortmess+=c
 		autocmd User lsp_setup call lsp#register_server({
 			\ 'name': 'flow',
 			\ 'cmd': {server_info->['flow', 'lsp', '--from', 'vim-lsp']},
-			\ 'root_uri':{server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), '.flowconfig'))},
+			\ 'root_uri':{server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), ['.flowconfig','.git/']))},
 			\ 'whitelist': ['javascript', 'javascript.jsx'],
 			\ })
 	endif
