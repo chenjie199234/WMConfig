@@ -1,0 +1,6 @@
+[Match]
+Name=enp2s0
+[Network]
+DHCP=yes
+[DHCP]
+RouteMetric=10

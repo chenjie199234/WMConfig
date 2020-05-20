@@ -1,0 +1,6 @@
+[Match]
+Name=wlp1s0
+[Network]
+DHCP=yes
+[DHCP]
+RouteMetric=20
