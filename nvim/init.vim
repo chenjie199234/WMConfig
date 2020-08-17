@@ -1,22 +1,14 @@
 "设置插件
 call plug#begin($HOME..'/.config/nvim/plugs')
 	Plug 'preservim/nerdcommenter'
-	Plug 'scrooloose/nerdtree'
 	Plug 'morhetz/gruvbox'
 	Plug 'bling/vim-bufferline'
-	Plug 'jiangmiao/auto-pairs'
 	"lsp
-	Plug 'prabirshrestha/async.vim'
-	Plug 'prabirshrestha/vim-lsp'
-	Plug 'prabirshrestha/asyncomplete.vim'
-	Plug 'prabirshrestha/asyncomplete-lsp.vim'
-	"snippets
-	Plug 'prabirshrestha/asyncomplete-neosnippet.vim'
-	Plug 'Shougo/neosnippet.vim'
-	Plug 'Shougo/neosnippet-snippets'
+	Plug 'neoclide/coc.nvim', {'branch': 'release'}
 call plug#end()
 filetype plugin indent on
 
+set updatetime=100
 "禁止使用备份
 set nobackup
 set nowritebackup
@@ -107,17 +99,20 @@ set shortmess+=c
 	nnoremap <C-r> <NOP>
 "文件保存退出
 	nnoremap ww :w<CR>
-	nnoremap qq :q!<CR>
 	nnoremap wq :wq<CR>
+	nnoremap qq :q!<CR>
+	nnoremap <C-q> :q!<CR>
+	nnoremap <M-q> :q!<CR>
+	nnoremap <C-d> :bd<CR>
+	nnoremap <M-d> :bd<CR>
+	nnoremap <C-n> :bn<CR>
+	nnoremap <M-n> :bn<CR>
+	nnoremap <C-b> :bp<CR>
+	nnoremap <M-b> :bp<CR>
 	nnoremap ZZ <NOP>
 "窗口移动
 	nnoremap <M-w> <C-w>w
 	nnoremap <C-w> <C-w>w
-"打开文件选择
-	nnoremap <M-d> :bd<CR>
-	nnoremap <C-d> :bd<CR>
-	nnoremap <C-n> :bn<CR>
-	nnoremap <M-n> :bp<CR>
 "取消绘制当前行到屏幕顶部中部或下部的重复的快捷键，使用zt,zz,zb代替
 	nnoremap z<CR> <NOP>
 	nnoremap z. <NOP>
@@ -128,7 +123,9 @@ set shortmess+=c
 	nnoremap zL <NOP>
 "插入模式下移动快捷键,以及补全快捷键
 	inoremap <expr><C-j> pumvisible() ? "\<C-n>" : "\<Down>"
+	inoremap <expr><M-j> pumvisible() ? "\<C-n>" : "\<Down>"
 	inoremap <expr><C-k> pumvisible() ? "\<C-p>" : "\<Up>"
+	inoremap <expr><M-k> pumvisible() ? "\<C-p>" : "\<Up>"
 	inoremap <C-h> <Left>
 	inoremap <C-l> <Right>
 	inoremap <C-o> <Esc>o
@@ -150,133 +147,103 @@ set shortmess+=c
 	tnoremap <Esc> <C-\><C-n>
 	tnoremap <M-w> <C-\><C-n><C-w>w
 	tnoremap <C-w> <C-\><C-n><C-w>w
-"asyncomplete
-	function! s:MySort(options, matches) abort
-		let l:items = []
-		for [l:source_name, l:matches] in items(a:matches)
-			for l:item in l:matches['items']
-				"format neosnippets
-				if l:source_name == 'neosnippet'
-					let l:item['menu']=strpart(l:item['menu'],7)
-					let l:item['kind']='snippets'
-				endif
-				"mark score
-				let l:matchpos = stridx(tolower(l:item['word']), tolower(a:options['base']))
-				if l:matchpos == 0
-					let l:item['priority'] = get(asyncomplete#get_source_info(l:source_name),'priority',0)+10
-					call add(l:items, l:item)
-				elseif l:matchpos > 0
-					let l:item['priority'] = get(asyncomplete#get_source_info(l:source_name),'priority',0)+5
-					call add(l:items, l:item)
-				endif
-			endfor
-		endfor
-		let l:items = sort(l:items, {a, b -> b['priority'] - a['priority']})
-		call asyncomplete#preprocess_complete(a:options, l:items)
-	endfunction
-	let g:asyncomplete_preprocessor = [function('s:MySort')]
-"vim-lsp
-	if executable('gopls')
-		autocmd User lsp_setup call lsp#register_server({
-			\ 'name': 'gopls',
-			\ 'cmd': {server_info->['gopls']},
-			\ 'root_uri':{server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), ['go.mod','.git/']))},
-			\ 'whitelist': ['go'],
-			\ })
-		autocmd BufWritePre *.go silent LspDocumentFormatSync 
-	endif
-	if executable('clangd')
-		autocmd User lsp_setup call lsp#register_server({
-			\ 'name': 'clangd',
-			\ 'cmd': {server_info->['clangd', '-background-index']},
-			\ 'root_uri':{server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), ['CMakeLists.txt','.git/']))},
-			\ 'whitelist': ['c', 'cpp', 'objc', 'objcpp'],
-			\ })
-	endif
-	if executable('flow')
-		autocmd User lsp_setup call lsp#register_server({
-			\ 'name': 'flow',
-			\ 'cmd': {server_info->['flow', 'lsp', '--from', 'vim-lsp']},
-			\ 'root_uri':{server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), ['.flowconfig','.git/']))},
-			\ 'whitelist': ['javascript', 'javascript.jsx'],
-			\ })
-	endif
-	let g:lsp_diagnostics_float_cursor = 1
-	let g:lsp_diagnostics_float_delay = 200
-	let g:lsp_virtual_text_enabled = 0
-	let g:lsp_highlight_references_enabled = 1
-	"代码跳转
+"coc
+	let g:coc_global_extensions = ['coc-snippets','coc-pairs','coc-explorer']
+	inoremap <silent><expr> <CR> pumvisible() ? coc#_select_confirm():"\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+	nmap <silent> <C-r> <ESC>:<C-u>call CocActionAsync('rename')<CR>
+	nmap <silent> <M-r> <ESC>:<C-u>call CocActionAsync('rename')<CR>
+	nmap <silent> <C-i> <ESC>:<C-u>call CocActionAsync('jumpDefinition')<CR>
+	nmap <silent> <M-i> <ESC>:<C-u>call CocActionAsync('jumpDefinition')<CR>
+	nmap <silent> ` <ESC>:<C-u>call CocActionAsync('doHover')<CR>
+	nmap <silent> <C-`> <ESC>:<C-u>call CocActionAsync('doHover')<CR>
+	nmap <silent> <M-`> <ESC>:<C-u>call CocActionAsync('doHover')<CR>
+	nmap <silent> <ESC> <ESC>:<C-u>call coc#util#float_hide()<CR>
 	nmap <M-o> <C-o>
-	nmap <C-i> <plug>(lsp-definition)
-	nmap <M-i> <plug>(lsp-peek-definition)
-	"显示光标下的变量或者函数的信息
-	nmap ` <plug>(lsp-hover)
-	"如果存在preview窗口就关闭
-	nmap <ESC> <plug>(lsp-preview-close)
-	"如果存在preview窗口就进入
-	nmap <CR> <plug>(lsp-preview-focus)
-	"重命名变量
-	nmap <C-r> <plug>(lsp-rename)
-	nmap <M-r> <plug>(lsp-rename)
-	"优先search,然后error,最后reference
+	inoremap <silent><expr> <TAB>
+	  \ pumvisible() ? coc#_select_confirm() :
+	  \ coc#expandableOrJumpable() ?
+	  \ "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+	  \ <SID>check_back_space() ? "\<TAB>" :
+	  \ coc#refresh()
+	function! s:check_back_space() abort
+	  let col = col('.') - 1
+	  return !col || getline('.')[col - 1]  =~# '\s'
+	endfunction
+	let g:coc_snippet_next = '<tab>'
+	call coc#config('coc.preferences',{
+	\ 	"formatOnSaveFiletypes":["go","h","c","cpp","hxx","cxx"],
+	\ 	"bracketEnterImprove":"true"
+	\})
+	call coc#config('diagnostic',{
+	\ 	"checkCurrentLine":"true"
+	\})
+	call coc#config('languageserver',{
+	\ 'golang': {
+	\ 	"command": "gopls",
+      	\ 	"rootPatterns": ["go.mod"],
+      	\ 	"disableWorkspaceFolders": "true",
+      	\ 	"filetypes": ["go"]
+	\ },
+	\ 'clangd': {
+      	\ 	"command": "clangd",
+      	\ 	"rootPatterns": ["compile_flags.txt", "compile_commands.json"],
+      	\ 	"filetypes": ["c", "cc", "cpp", "c++", "objc", "objcpp"]
+	\ },
+    	\ 'lua': {
+      	\ 	"command": "lua-lsp",
+      	\ 	"filetypes": ["lua"]
+    	\ }
+	\})
+
+	"优先search,然后warning/error,最后reference
 	function SearchNext()
 		"获取当前行和列
 		let s:bl=line(".")
 		let s:bc=col(".")
-		silent! execute "normal! /\<CR>"
+		silent! execute "normal! n"
 		let s:al=line(".")
 		let s:ac=col(".")
 		if s:bl == s:al && s:bc == s:ac
-			let s:ec=lsp#get_buffer_diagnostics_counts()
-			if s:ec['error'] > 0
-				silent! execute "normal! :LspNextError\<CR>"
+			let s:eandw = 0
+			if exists("b:coc_diagnostic_info")
+				let s:eandw = b:coc_diagnostic_info['error']+b:coc_diagnostic_info['warning']
+			endif
+			if s:eandw > 0
+				call CocActionAsync('diagnosticNext')
 			else
-				silent! execute "normal! :LspNextReference\<CR>"
+				call CocActionAsync('jumpReferences')
 			endif
 		endif
 	endfunction
-	"优先search,然后error,最后reference
+	""优先search,然后warning/error,最后reference
 	function SearchPrev()
 		let s:bl=line(".")
 		let s:bc=col(".")
-		silent! execute "normal! ?\<CR>"
+		silent! execute "normal! N"
 		let s:al=line(".")
 		let s:ac=col(".")
 		if s:bl == s:al && s:bc == s:ac
-			let s:ec=lsp#get_buffer_diagnostics_counts()
-			if s:ec['error'] > 0
-				silent! execute "normal! :LspPreviousError\<CR>"
+			let s:eandw = 0
+			if exists("b:coc_diagnostic_info")
+				let s:eandw = b:coc_diagnostic_info['error']+b:coc_diagnostic_info['warning']
+			endif
+			if s:eandw > 0
+				call CocActionAsync('diagnosticPrevious')
 			else
-				silent! execute "normal! :LspPreviousReference\<CR>"
+				call CocActionAsync('jumpReferences')
 			endif
 		endif
 	endfunction
 	nmap <silent> n :call SearchNext()<CR>
 	nmap <silent> N :call SearchPrev()<CR>
-"snippets
-	call asyncomplete#register_source(asyncomplete#sources#neosnippet#get_source_options({
-		\ 'name': 'neosnippet',
-		\ 'whitelist': ['*'],
-		\ 'completor': function('asyncomplete#sources#neosnippet#completor'),
-		\ 'priority': -1,
-		\ }))
-	let g:neosnippet#enable_completed_snippet=1
-	imap <expr> <TAB> neosnippet#expandable_or_jumpable() ? "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
-	smap <expr> <TAB> neosnippet#expandable_or_jumpable() ? "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+	nnoremap <C-f> <ESC>:CocCommand explorer --toggle --position floating<CR>
+	nnoremap <M-f> <ESC>:CocCommand explorer --toggle --position floating<CR>
 "nerdcommenter
 	let g:NERDCreateDefaultMappings=0
 	let g:NERDDefaultAlign='left'
 	let g:NERDCompactSexyComs=1
 	nmap ; <plug>NERDCommenterToggle
 	vmap ; <plug>NERDCommenterToggle
-"auto-pairs
-	let g:AutoPairsShortcutToggle = ''
-	let g:AutoPairsShortcutFastWrap = ''
-	let g:AutoPairsShortcutJump = ''
-	let g:AutoPairsShortcutBackInsert = ''
-	let g:AutoPairsMapCh=0
-	inoremap < <><ESC>i
-	inoremap << <<
 "bufferline
 	let g:bufferline_show_bufnr=0
 	let g:bufferline_solo_highlight=0
@@ -288,22 +255,6 @@ set shortmess+=c
 	set background=dark
 	"取消gruvbox的背景颜色,使用term自带的背景颜色,以此来使用透明背景
 	hi normal guibg=none ctermbg=none
-"NERDTree
-	nnoremap <M-f> :NERDTreeToggle<CR>
-	nnoremap <C-f> :NERDTreeToggle<CR>
-	"没有指定文件地打开neovim时，自动打开nerdtree
-	autocmd VimEnter * if argc() == 0 | NERDTree | endif
-	"自动变更当前工作目录
-	let NERDTreeChDirMode=2
-	"窗口的宽度
-	let NERDTreeWinSize=25
-	"不显示帮助信息
-	let NERDTreeMinimalUI=1
-	"目录前显示的导航箭头
-	let g:NERDTreeDirArrowExpandable='>'
-	let g:NERDTreeDirArrowCollapsible='<'
-	"自动删除不存在的buffer
-	let NERDTreeAutoDeleteBuffer=1
 "设置折叠
 	set foldmethod=indent
 	set foldlevel=1

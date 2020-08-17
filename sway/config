@@ -13,7 +13,7 @@
     }
     output HDMI-A-1 {
         background $bg2 fill
-        resolution 1920x1200
+        resolution 1920x1080
         position 1920,0
     }
 ### Input configuration
@@ -35,7 +35,7 @@
 	pointer_accel 0
     }
 ### Default start program when start sway
-    exec aria2c
+    #exec aria2c
     exec fcitx 1> /dev/null 2>&1
     exec mocp -M ~/.config/moc -m ~/Music -S 1> /dev/null 2>&1
     exec swayidle -w timeout 300 'swaylock -f -i $bglock -s fill' timeout 600 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"'
@@ -58,7 +58,7 @@
     bindsym $mod+Shift+period		move container to workspace 2
     bindsym $mod+slash			workspace next
 ### Key binding
-    set $term lxterminal
+    set $term alacritty
     # lock
     bindsym $mod+Return 		exec swaylock -i $bglock -s fill
     # screenshot
@@ -67,22 +67,12 @@
     bindsym $mod+bracketleft		exec $term -e mocp -M ~/.config/moc -m ~/Music
     # start wifi
     bindsym $mod+bracketright 		exec $term -e nmtui
-    # start a termina
+    # start a terminal
     bindsym $mod+1 			exec $term
     # start web browser
     bindsym $mod+2 			exec chromium --incognito 2> /dev/null
-    # start file browser
-    bindsym $mod+3 			exec pcmanfm 2> /dev/null
     # start music player
-    bindsym $mod+4			exec mocp -M ~/.config/moc -a ~/Music -p 2> /dev/null
-    # start darktable
-    bindsym $mod+5			exec darktable 2> /dev/null
-    # start hugin
-    bindsym $mod+6			exec hugin 2> /dev/null
-    # start gimp
-    bindsym $mod+7			exec gimp 2> /dev/null
-    # start blender
-    bindsym $mod+8			exec blender 2> /dev/null
+    bindsym $mod+3			exec mocp -M ~/.config/moc -a ~/Music -p 2> /dev/null
     # control music player by key
     bindsym $mod+F4			exec mocp -M ~/.config/moc -r 2> /dev/null
     bindsym $mod+F5 			exec mocp -M ~/.config/moc -G 2> /dev/null
