@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"flag"
 	"fmt"
@@ -34,6 +35,12 @@ func main() {
 	lastdiskread := make(map[string]uint64)
 	lastdiskwrite := make(map[string]uint64)
 
+	statusprefix := []byte("status")
+	durationprefix := []byte("duration")
+	positionprefix := []byte("position")
+	fileprefix := []byte("file")
+	stopped := []byte("stopped")
+
 	fmt.Println("{\"version\":1}")
 	fmt.Println("[")
 	fmt.Println("[]")
@@ -61,7 +68,7 @@ func main() {
 						cards = append(cards, card)
 					}
 				}
-				for n, _ := range lastnetup {
+				for n := range lastnetup {
 					find := false
 					for _, card := range cards {
 						if card.Name == n {
@@ -206,58 +213,44 @@ func main() {
 		}
 		//music
 		{
-			cmd := exec.Command("mocp", "-M", "~/.config/moc", "-Q", "%state", "2>", "/dev/null")
-			if v, e := cmd.Output(); e == nil {
-				if v[len(v)-1] == '\n' {
-					v = v[:len(v)-1]
-				}
-				v = bytes.ToLower(v)
-				if !bytes.Equal(v, []byte("stop")) {
-					cmd_song := exec.Command("mocp", "-M", "~/.config/moc", "-Q", "%song", "2>", "/dev/null")
-					//cmd_artist := exec.Command("mocp", "-M", "~/.config/moc", "-Q", "%artist", "2>", "/dev/null")
-					cmd_tt := exec.Command("mocp", "-M", "~/.config/moc", "-Q", "%tt", "2>", "/dev/null")
-					cmd_ct := exec.Command("mocp", "-M", "~/.config/moc", "-Q", "%ct", "2>", "/dev/null")
-					song, e := cmd_song.Output()
-					if e != nil {
-						goto NOMUSIC
-					}
-					/*
-						artist, e := cmd_artist.Output()
-						if e != nil {
-							goto NOMUSIC
-						}
-					*/
-					tt, e := cmd_tt.Output()
-					if e != nil {
-						goto NOMUSIC
-					}
-					ct, e := cmd_ct.Output()
-					if e != nil {
-						goto NOMUSIC
-					}
-					if song[len(song)-1] == '\n' {
-						song = song[:len(song)-1]
-					}
-					/*
-						if artist[len(artist)-1] == '\n' {
-							artist= artist[:len(artist)-1]
-						}
-					*/
-					if tt[len(tt)-1] == '\n' {
-						tt = tt[:len(tt)-1]
-					}
-					if ct[len(ct)-1] == '\n' {
-						ct = ct[:len(ct)-1]
-					}
-					song = append(song, ' ')
-					ct = append(ct, '/')
-					text := append(song, ct...)
-					text = append(text, tt...)
-					setjson("music", text)
-				}
-			} else {
+			var status []byte
+			var duration []byte
+			var position []byte
+			var file []byte
+			v, e := exec.Command("cmus-remote", "-Q").Output()
+			if e != nil {
 				goto NOMUSIC
 			}
+			r := bufio.NewReader(bytes.NewReader(v))
+			for {
+				line, _, e := r.ReadLine()
+				if e != nil {
+					goto NOMUSIC
+				}
+				if bytes.HasPrefix(line, statusprefix) {
+					status = bytes.TrimSpace(line[6:])
+					if bytes.Equal(status, stopped) {
+						goto NOMUSIC
+					}
+				} else if bytes.HasPrefix(line, durationprefix) {
+					duration = bytes.TrimSpace(line[8:])
+				} else if bytes.HasPrefix(line, positionprefix) {
+					position = bytes.TrimSpace(line[8:])
+				} else if bytes.HasPrefix(line, fileprefix) {
+					file = bytes.TrimSpace(line[4:])
+					si := bytes.LastIndex(file, []byte{'/'})
+					ei := bytes.LastIndex(file, []byte{'.'})
+					if si == -1 || si == 0 || ei == -1 || ei == 0 || si >= ei {
+						goto NOMUSIC
+					}
+					file = file[si+1 : ei]
+				}
+				if status != nil && duration != nil && position != nil && file != nil {
+					break
+				}
+			}
+			text := append(append(append(file, ' '), append(position, '/')...), duration...)
+			setjson("music", text)
 		}
 	NOMUSIC:
 		//cpu
