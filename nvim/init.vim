@@ -180,7 +180,7 @@ set shortmess+=c
 	call coc#config('languageserver',{
 	\ 'golang': {
 	\ 	"command": "gopls",
-      	\ 	"rootPatterns": ["go.mod"],
+      	\ 	"rootPatterns": ["go.mod",".git/"],
       	\ 	"disableWorkspaceFolders": "true",
       	\ 	"filetypes": ["go"]
 	\ },

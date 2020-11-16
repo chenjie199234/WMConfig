@@ -1,7 +1,10 @@
 ### Global
-    font Source Code Pro Regular 11
-    set $mod Mod4
-    floating_modifier $mod normal
+    font								Source Code Pro Regular 11
+    set									$mod		Mod4
+    set									$term		alacritty
+    floating_modifier							$mod		normal
+    for_window [app_id="Alacritty" title="cmus*" shell="xdg_shell"] 	move  container to workspace music
+    for_window [shell=".*"] 						inhibit_idle	fullscreen
 ### Output
     set $bglock ~/.config/sway/images/bglock.jpg
     set $bg1 ~/.config/sway/images/bg2.png
@@ -26,23 +29,23 @@
         middle_emulation enabled
 	#disabled 双指向下滚，画面向下滚，双指向上滚，画面向上滚
 	#enabled 双指向下滚，画面向上滚，双指向上滚，画面向下滚
-        natural_scroll disabled
+        natural_scroll enabled
     }
     input "9639:64097:Compx_2.4G_Receiver_Mouse" {
 	accel_profile adaptive
 	drag enabled
 	drag_lock enabled
-	pointer_accel 0
+	pointer_accel 0.5
     }
 ### Default start program when start sway
-    #exec aria2c
+    #cmus
+    exec $term -e cmus 2>/dev/null
+    #fcitx
     exec fcitx 1> /dev/null 2>&1
-    exec mocp -M ~/.config/moc -m ~/Music -S 1> /dev/null 2>&1
-    exec swayidle -w timeout 300 'swaylock -f -i $bglock -s fill' timeout 600 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"'
-### Interface
-    # general
-    for_window [shell=".*"] inhibit_idle	fullscreen
+    #swayidle
+    exec swayidle -w timeout 300 'swaylock -f -i $bglock -s fill' timeout 600 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' before-sleep 'swaylock -f -i $bglock -s fill'
     #xwayland				disable
+### Interface
     gaps				inner 5
     gaps				outer 5
     default_border			pixel 3
@@ -56,27 +59,21 @@
     bindsym $mod+period			workspace 2
     bindsym $mod+Shift+comma		move container to workspace 1
     bindsym $mod+Shift+period		move container to workspace 2
-    bindsym $mod+slash			workspace next
 ### Key binding
-    set $term alacritty
     # lock
     bindsym $mod+Return 		exec swaylock -i $bglock -s fill
     # screenshot
     bindsym $mod+s			exec grim -g "$(slurp)" $HOME/$(date +'%Y-%m-%d-%H:%M:%S.png')
-    # start music player interface
-    bindsym $mod+bracketleft		exec $term -e mocp -M ~/.config/moc -m ~/Music
-    # start wifi
-    bindsym $mod+bracketright 		exec $term -e nmtui
     # start a terminal
     bindsym $mod+1 			exec $term
     # start web browser
     bindsym $mod+2 			exec chromium --incognito 2> /dev/null
     # start music player
-    bindsym $mod+3			exec mocp -M ~/.config/moc -a ~/Music -p 2> /dev/null
+    bindsym $mod+3			exec cmus-remote -l $HOME/Music;exec cmus-remote -C "set shuffle=true";exec cmus-remote -C "set repeat=true";exec cmus-remote -p
     # control music player by key
-    bindsym $mod+F4			exec mocp -M ~/.config/moc -r 2> /dev/null
-    bindsym $mod+F5 			exec mocp -M ~/.config/moc -G 2> /dev/null
-    bindsym $mod+F6 			exec mocp -M ~/.config/moc -f 2> /dev/null
+    bindsym $mod+F4			exec cmus-remote -k 1;exec cmus-remote -r
+    bindsym $mod+F5 			exec cmus-remote -u
+    bindsym $mod+F6 			exec cmus-remote -n
     # control audio by key
     bindsym $mod+F1			exec pamixer			-t
     bindsym $mod+Ctrl+F1		exec pamixer --default-source	-t
@@ -152,7 +149,7 @@
     client.unfocused #00000000 #4682B480 #0000CD #FF0000 #FFC0CB
 # Status Bar:
 bar {
-    separator_symbol ":|:"
+    separator_symbol "||"
     status_command "~/.config/sway/bin/bar -b"
     position top
     colors {

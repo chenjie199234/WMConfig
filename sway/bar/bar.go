@@ -249,7 +249,19 @@ func main() {
 					break
 				}
 			}
-			text := append(append(append(file, ' '), append(position, '/')...), duration...)
+			d, e := strconv.Atoi(string(duration))
+			if e != nil {
+				goto NOMUSIC
+			}
+			p, e := strconv.Atoi(string(position))
+			if e != nil {
+				goto NOMUSIC
+			}
+			dm := d / 60
+			ds := d % 60
+			pm := p / 60
+			ps := p % 60
+			text := string(file) + " " + fmt.Sprintf("%02d:%02d", pm, ps) + "/" + fmt.Sprintf("%02d:%02d", dm, ds)
 			setjson("music", text)
 		}
 	NOMUSIC:
