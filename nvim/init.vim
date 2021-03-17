@@ -251,10 +251,11 @@ set shortmess+=c
 	autocmd VimEnter * let &statusline='%{bufferline#refresh_status()}' .bufferline#get_status_string().'%<%=%r %m %f %-5.15(%l,%c-%v%) %p%%'
 "Color
 	colorscheme gruvbox
-	set termguicolors
 	set background=dark
 	"取消gruvbox的背景颜色,使用term自带的背景颜色,以此来使用透明背景
-	hi normal guibg=none ctermbg=none
+	if has("gui_running") || !has("mac")
+		hi normal guibg=none ctermbg=none
+	endif
 "设置折叠
 	set foldmethod=indent
 	set foldlevel=1
