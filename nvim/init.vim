@@ -157,7 +157,7 @@ set shortmess+=c
 	nmap <silent> ` <ESC>:<C-u>call CocActionAsync('doHover')<CR>
 	nmap <silent> <C-`> <ESC>:<C-u>call CocActionAsync('doHover')<CR>
 	nmap <silent> <M-`> <ESC>:<C-u>call CocActionAsync('doHover')<CR>
-	nmap <silent> <ESC> <ESC>:<C-u>call coc#util#float_hide()<CR>
+	nmap <silent> <ESC> <ESC>:<C-u>call coc#float#close_all()<CR>
 	nmap <M-o> <C-o>
 	inoremap <silent><expr> <TAB>
 	  \ pumvisible() ? coc#_select_confirm() :

@@ -68,6 +68,7 @@
     bindsym $mod+1 			exec $term
     # start web browser
     bindsym $mod+2 			exec chromium --incognito 2> /dev/null
+    #bindsym $mod+2 			exec chromium --incognito -enable-features=UseOzonePlatform -ozone-platform=wayland 2> /dev/null
     # start music player
     bindsym $mod+3			exec cmus-remote -l $HOME/Music;exec cmus-remote -C "set shuffle=true";exec cmus-remote -C "set repeat=true";exec cmus-remote -p
     # control music player by key
